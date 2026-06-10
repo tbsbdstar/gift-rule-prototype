@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>赠品规则 · 玛鲁丸后台管理系统 (v1.5)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; background: #f0f2f5; color: #333; }
+
+  /* ── Layout ── */
+  .layout { display: flex; height: 100vh; }
+  .sidebar { width: 210px; background: #2b3a4f; flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; }
+  .sidebar-logo { height: 56px; display: flex; align-items: center; gap: 9px; padding: 0 18px; color: #fff; font-size: 16px; font-weight: 600; border-bottom: 1px solid #ffffff14; flex-shrink: 0; }
+  .sidebar-logo span { color: #4aa3ff; font-size: 18px; }
+  .sidebar-menu { padding: 6px 0 24px; }
+  .sidebar-group { color: #ffffff60; font-size: 11px; padding: 10px 18px 4px; }
+  .sidebar-item { padding: 11px 18px; color: #c4ccd8; cursor: pointer; display: flex; align-items: center; gap: 11px; transition: .15s; font-size: 13.5px; }
+  .sidebar-item span { flex: 1; }
+  .sidebar-item i { width: 18px; text-align: center; font-style: normal; opacity: .92; flex-shrink: 0; }
+  .sidebar-item .chev { font-style: normal; color: #ffffff66; font-size: 12px; }
+  .sidebar-item:hover { background: #ffffff12; color: #fff; }
+  .sidebar-item.open { color: #fff; background: #ffffff0a; }
+  .sidebar-sub { background: #222e3d; }
+  .sub-item { padding: 10px 18px 10px 47px; color: #aeb7c4; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; transition: .15s; }
+  .sub-item i { font-style: normal; width: 16px; text-align: center; }
+  .sub-item:hover { color: #fff; background: #ffffff0d; }
+  .sub-item.active { color: #fff; background: #2a3b50; box-shadow: inset 3px 0 0 #1890ff; }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { height: 56px; background: #fff; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; padding: 0 20px; gap: 10px; flex-shrink: 0; }
+  .breadcrumb { color: #999; font-size: 13px; }
+  .breadcrumb b { color: #333; font-weight: 600; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; color: #888; }
+  .topbar-user { display: flex; align-items: center; gap: 7px; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#1890ff,#52c41a); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; }
+  .content { flex: 1; overflow-y: auto; padding: 16px; }
+
+  /* ── Buttons ── */
+  .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 5px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: .15s; white-space: nowrap; }
+  .btn-primary { background: #1890ff; color: #fff; }
+  .btn-primary:hover { background: #40a9ff; }
+  .btn-default { background: #fff; color: #555; border: 1px solid #d9d9d9; }
+  .btn-default:hover { border-color: #1890ff; color: #1890ff; }
+  .btn-danger { background: #fff; color: #ff4d4f; border: 1px solid #ffa39e; }
+  .btn-danger:hover { background: #fff1f0; }
+  .btn-link { background: none; border: none; color: #1890ff; padding: 2px 4px; cursor: pointer; font-size: 12px; }
+  .btn-link:hover { color: #40a9ff; }
+  .btn-link.danger { color: #ff4d4f; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── Stats ── */
+  .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 12px; }
+  .stat-card { background: #fff; border-radius: 8px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; }
+  .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .stat-num { font-size: 24px; font-weight: 700; color: #222; line-height: 1.1; }
+  .stat-label { font-size: 12px; color: #999; margin-top: 3px; }
+
+  /* ── Page header / filter ── */
+  .panel { background: #fff; border-radius: 8px; }
+  .page-header { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; }
+  .page-title { font-size: 15px; font-weight: 600; color: #222; }
+  .filter-bar { padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; border-bottom: 1px solid #f0f0f0; }
+  .filter-item { display: flex; flex-direction: column; gap: 5px; }
+  .filter-item label { font-size: 12px; color: #888; }
+  .filter-item input, .filter-item select { height: 32px; border: 1px solid #d9d9d9; border-radius: 5px; padding: 0 10px; font-size: 13px; color: #333; outline: none; background: #fff; }
+  .filter-item input:focus, .filter-item select:focus { border-color: #1890ff; box-shadow: 0 0 0 2px #1890ff20; }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #fafafa; padding: 11px 12px; text-align: left; font-weight: 600; color: #555; font-size: 12px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+  td { padding: 12px; border-bottom: 1px solid #f5f5f5; font-size: 13px; vertical-align: middle; }
+  tr:hover td { background: #f5f9ff; }
+  .rule-name { font-weight: 600; color: #222; }
+  .rule-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+  .tag-green { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+  .tag-orange { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+  .tag-red { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
+  .tag-gray { background: #fafafa; color: #999; border: 1px solid #d9d9d9; }
+  .tag-blue { background: #e6f4ff; color: #1890ff; border: 1px solid #91d5ff; }
+  .tag-purple { background: #f9f0ff; color: #722ed1; border: 1px solid #d3adf7; }
+  .tag-cyan { background: #e6fffb; color: #13c2c2; border: 1px solid #87e8de; }
+  .ops { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; }
+  .empty { text-align: center; padding: 56px; color: #bbb; }
+  .empty .big { font-size: 40px; opacity: .4; }
+
+  /* switch */
+  .switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #d9d9d9; border-radius: 20px; cursor: pointer; transition: .2s; }
+  .slider:before { position: absolute; content: ''; height: 14px; width: 14px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  input:checked + .slider { background: #52c41a; }
+  input:checked + .slider:before { transform: translateX(18px); }
+
+  /* ── Modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: #00000060; z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding: 30px 16px; overflow-y: auto; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: #fff; border-radius: 10px; width: 860px; max-width: 100%; box-shadow: 0 8px 40px #0004; display: flex; flex-direction: column; animation: pop .2s ease; }
+  @keyframes pop { from { transform: translateY(-16px); opacity: .6 } to { transform: none; opacity: 1 } }
+  .modal-sm { width: 440px; }
+  .modal-header { padding: 16px 22px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { font-size: 16px; font-weight: 600; color: #222; }
+  .modal-close { width: 30px; height: 30px; border: none; background: none; cursor: pointer; color: #999; border-radius: 5px; font-size: 20px; }
+  .modal-close:hover { background: #f5f5f5; color: #333; }
+  .modal-body { padding: 0; max-height: calc(100vh - 230px); overflow-y: auto; }
+  .modal-footer { padding: 14px 22px; border-top: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px; }
+  .modal-footer .spacer { flex: 1; }
+
+  /* ── Steps ── */
+  .steps { display: flex; padding: 18px 22px; gap: 0; background: #fafbfc; border-bottom: 1px solid #f0f0f0; }
+  .step { flex: 1; display: flex; align-items: center; gap: 10px; position: relative; }
+  .step:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: calc(50% + 22px); right: calc(-50% + 22px); height: 2px; background: #e8e8e8; }
+  .step.done::after { background: #52c41a; }
+  .step-num { width: 30px; height: 30px; border-radius: 50%; background: #e8e8e8; color: #999; display: flex; align-items: center; justify-content: center; font-weight: 600; flex-shrink: 0; z-index: 1; transition: .2s; font-size: 13px; }
+  .step.active .step-num { background: #1890ff; color: #fff; }
+  .step.done .step-num { background: #52c41a; color: #fff; }
+  .step-text .t { font-size: 13px; font-weight: 600; color: #999; }
+  .step-text .d { font-size: 11px; color: #bbb; }
+  .step.active .step-text .t { color: #1890ff; }
+  .step.done .step-text .t { color: #333; }
+
+  .step-panel { display: none; padding: 22px; }
+  .step-panel.show { display: block; }
+
+  /* ── Form ── */
+  .form-row { display: flex; gap: 18px; margin-bottom: 18px; }
+  .form-item { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .form-item.fixed { flex: 0 0 200px; }
+  .form-label { font-size: 13px; color: #444; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+  .form-label .req { color: #ff4d4f; }
+  .form-input, .form-select, .form-textarea { border: 1px solid #d9d9d9; border-radius: 6px; padding: 8px 11px; font-size: 13px; color: #333; outline: none; background: #fff; width: 100%; font-family: inherit; transition: .15s; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #1890ff; box-shadow: 0 0 0 2px #1890ff20; }
+  .form-textarea { resize: vertical; min-height: 60px; }
+  .form-hint { font-size: 11px; color: #aaa; }
+  .form-err { font-size: 11px; color: #ff4d4f; display: none; }
+  .form-err.show { display: block; }
+  .invalid .form-input, .invalid .form-select, .invalid .tag-input-wrap { border-color: #ff4d4f !important; }
+  .range { display: flex; align-items: center; gap: 8px; }
+  .range .sep { color: #999; }
+
+  /* card-radio (贸易类型 / 玩法 / 来源 / 模式) */
+  .card-radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
+  .card-radio { flex: 1; min-width: 150px; border: 1.5px solid #e8e8e8; border-radius: 8px; padding: 13px 15px; cursor: pointer; transition: .15s; position: relative; background: #fff; }
+  .card-radio:hover { border-color: #91d5ff; }
+  .card-radio.sel { border-color: #1890ff; background: #f5fbff; }
+  .card-radio.sel::after { content: '✓'; position: absolute; top: 8px; right: 10px; color: #1890ff; font-weight: 700; }
+  .card-radio .ct { font-size: 13px; font-weight: 600; color: #222; display: flex; align-items: center; gap: 6px; }
+  .card-radio .cd { font-size: 11px; color: #999; margin-top: 5px; line-height: 1.5; }
+  .card-radio.disabled { opacity: .45; cursor: not-allowed; pointer-events: none; }
+
+  /* radio inline */
+  .radio-group { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+  .radio-item { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: #444; }
+  .radio-item input { accent-color: #1890ff; width: 15px; height: 15px; }
+
+  /* info boxes */
+  .alert { border-radius: 6px; padding: 10px 14px; font-size: 12px; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 16px; line-height: 1.6; }
+  .alert-info { background: #e6f4ff; border: 1px solid #91d5ff; color: #0958d9; }
+  .alert-warn { background: #fffbe6; border: 1px solid #ffe58f; color: #d48806; }
+  .alert-red { background: #fff1f0; border: 1px solid #ffa39e; color: #cf1322; }
+  .alert .ic { flex-shrink: 0; }
+  /* 向导内暂时隐藏提示框图标 */
+  #wizard .alert .ic { display: none; }
+
+  .section-title { font-size: 13px; font-weight: 700; color: #222; margin: 4px 0 14px; display: flex; align-items: center; gap: 7px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+  .section-title::before { content: ''; width: 3px; height: 14px; background: #1890ff; border-radius: 2px; }
+
+  /* SKU resolver */
+  .sku-resolver { border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden; }
+  .sku-input-bar { display: flex; gap: 8px; padding: 12px; background: #fafbfc; border-bottom: 1px solid #f0f0f0; }
+  .sku-input-bar .form-input { flex: 1; }
+  .sku-list { padding: 6px 12px; max-height: 230px; overflow-y: auto; }
+  .sku-empty { padding: 22px; text-align: center; color: #bbb; font-size: 12px; }
+  .sku-row { display: flex; align-items: center; gap: 11px; padding: 9px 4px; border-bottom: 1px solid #f5f5f5; }
+  .sku-row:last-child { border-bottom: none; }
+  .sku-thumb { width: 38px; height: 38px; border-radius: 6px; background: linear-gradient(135deg,#e8f4ff,#d4e8ff); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .sku-thumb.err { background: #fff1f0; }
+  .sku-meta { flex: 1; min-width: 0; }
+  .sku-name { font-size: 13px; font-weight: 500; color: #333; }
+  .sku-code { font-size: 11px; color: #999; margin-top: 2px; }
+  .sku-qty { width: 64px; }
+  .sku-qty input { width: 64px; height: 30px; border: 1px solid #d9d9d9; border-radius: 5px; text-align: center; outline: none; font-size: 13px; }
+  .sku-del { background: none; border: none; color: #ff7875; cursor: pointer; font-size: 16px; padding: 4px; }
+  .sku-stock { font-size: 11px; }
+
+  /* code query result table */
+  .code-table { width:100%; border:1px solid #e8e8e8; border-radius:8px; overflow:hidden; margin-top:10px; border-collapse:separate; border-spacing:0; }
+  .code-table th { background:#fafbfc; padding:9px 10px; font-size:12px; color:#666; text-align:left; border-bottom:1px solid #f0f0f0; white-space:nowrap; }
+  .code-table td { padding:9px 10px; font-size:12.5px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+  .code-table tbody tr:last-child td { border-bottom:none; }
+  .code-table thead th { position:sticky; top:0; z-index:1; }
+  .code-scroll { max-height:300px; overflow-y:auto; border:1px solid #e8e8e8; border-radius:8px; margin-top:8px; }
+  .code-scroll .code-table { margin-top:0; border:none; border-radius:0; }
+  .code-bar { display:flex; align-items:center; justify-content:space-between; margin-top:10px; font-size:12px; color:#888; }
+  .code-bar b { color:#333; }
+  .code-table .err-row td { background:#fff8f8; }
+  .code-del { background:none; border:none; color:#ff7875; cursor:pointer; font-size:16px; line-height:1; padding:2px 6px; border-radius:4px; }
+  .code-del:hover { background:#fff1f0; }
+  .code-empty { border:1px dashed #e0e0e0; border-radius:8px; margin-top:10px; padding:22px; text-align:center; color:#bbb; font-size:12px; }
+
+  /* tag pill chips for excluded codes */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { background: #e6f4ff; color: #1890ff; border-radius: 4px; padding: 3px 8px; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+  .chip.err { background: #fff1f0; color: #ff4d4f; }
+  .chip b { cursor: pointer; }
+
+  /* summary (step 4) */
+  .summary-card { border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+  .summary-head { background: #fafbfc; padding: 10px 14px; font-weight: 600; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; }
+  .summary-body { padding: 4px 14px; }
+  .summary-line { display: flex; padding: 8px 0; border-bottom: 1px dashed #f0f0f0; font-size: 13px; }
+  .summary-line:last-child { border-bottom: none; }
+  .summary-line .k { width: 130px; color: #999; flex-shrink: 0; }
+  .summary-line .v { color: #333; flex: 1; }
+
+  /* toast */
+  .toast { position: fixed; top: 22px; left: 50%; transform: translateX(-50%) translateY(-20px); background: #fff; border-radius: 8px; padding: 12px 20px; font-size: 13px; box-shadow: 0 6px 24px #0002; z-index: 9999; display: flex; align-items: center; gap: 9px; opacity: 0; transition: .3s; pointer-events: none; border-left: 4px solid #52c41a; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.err { border-left-color: #ff4d4f; }
+  .toast .ti { font-size: 18px; }
+
+  /* detail rows */
+  .detail-grid { display: grid; grid-template-columns: 130px 1fr; gap: 0; }
+  .detail-grid .dk { padding: 11px 14px; background: #fafafa; color: #888; font-size: 12px; border-bottom: 1px solid #f0f0f0; }
+  .detail-grid .dv { padding: 11px 14px; color: #333; border-bottom: 1px solid #f0f0f0; }
+
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #b0b0b0; }
+
+  /* ===== 整页式新建/编辑（覆盖弹窗样式） ===== */
+  #wizard.fullpage { position: fixed; inset: 56px 0 0 210px; background:#f0f2f5; z-index:50; display:none; overflow-y:auto; }
+  #wizard.fullpage.show { display:block; }
+  #wizard.fullpage .modal { width:auto; max-width:940px; margin:0 auto; background:transparent; box-shadow:none; border-radius:0; padding:18px 20px 88px; animation:none; max-height:none; }
+  #wizard.fullpage .modal-header { background:#fff; border-radius:10px; padding:16px 22px; border:none; margin-bottom:14px; box-shadow:0 1px 2px #0000000a; }
+  #wizard.fullpage .modal-header h3 { font-size:17px; }
+  #wizard.fullpage .steps { background:#fff; border-radius:10px; margin-bottom:14px; border:none; padding:20px 30px; }
+  #wizard.fullpage .modal-body { max-height:none; overflow:visible; }
+  #wizard.fullpage .step-panel { background:#fff; border-radius:10px; padding:22px 26px 24px; box-shadow:0 1px 2px #0000000a; min-height:300px; }
+  #wizard.fullpage .fp-card-title { font-size:14px; font-weight:700; color:#222; margin:0 0 16px; padding-bottom:11px; border-bottom:1px solid #f0f0f0; display:flex; align-items:center; gap:9px; }
+  #wizard.fullpage .fp-card-title .n { width:24px; height:24px; border-radius:50%; background:#1890ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; }
+  #wizard.fullpage .modal-footer { position:fixed; left:210px; right:0; bottom:0; background:#fff; border-top:1px solid #e8e8e8; padding:12px 20px; box-shadow:0 -2px 10px #0000000f; z-index:51; }
+  #wizard.fullpage .modal-footer .footer-inner { max-width:940px; margin:0 auto; display:flex; align-items:center; justify-content:flex-end; gap:10px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>❖</span>后台管理</div>
+    <div class="sidebar-menu">
+      <div class="sidebar-item"><i>📊</i><span>数据统计</span></div>
+      <div class="sidebar-item"><i>⚙️</i><span>系统设置</span><em class="chev">⌄</em></div>
+      <div class="sidebar-item"><i>🗂️</i><span>资料管理</span><em class="chev">⌄</em></div>
+      <div class="sidebar-item"><i>🛍️</i><span>商品管理</span><em class="chev">⌄</em></div>
+      <div class="sidebar-item"><i>📄</i><span>订单管理</span><em class="chev">⌄</em></div>
+      <div class="sidebar-item"><i>📋</i><span>采购管理</span><em class="chev">⌄</em></div>
+      <div class="sidebar-item"><i>🏷️</i><span>库存管理</span><em class="chev">⌄</em></div>
+      <div class="sidebar-item open"><i>📣</i><span>营销中心</span><em class="chev">⌃</em></div>
+      <div class="sidebar-sub">
+        <div class="sub-item"><i>★</i>砍价活动</div>
+        <div class="sub-item"><i>🎲</i>盲盒活动</div>
+        <div class="sub-item"><i>⏰</i>秒杀活动</div>
+        <div class="sub-item active"><i>🎁</i>赠品规则设置</div>
+      </div>
+      <div class="sidebar-item"><i>✅</i><span>工单管理</span><em class="chev">⌄</em></div>
+      <div class="sidebar-item"><i>⛔</i><span>异常中心</span></div>
+      <div class="sidebar-item"><i>🖥️</i><span>销售监控</span></div>
+      <div class="sidebar-item"><i>👤</i><span>用户管理</span><em class="chev">⌄</em></div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb">营销中心 / <b>赠品规则设置</b></div>
+      <div class="topbar-right">
+        <span style="font-size:12px;">满金额赠 · 满件数赠</span>
+        <div class="topbar-user"><span>运营小玛</span><div class="avatar">玛</div></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat-card"><div class="stat-icon" style="background:#e6f4ff">📋</div><div><div class="stat-num" id="statTotal">0</div><div class="stat-label">规则总数</div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#f6ffed">✅</div><div><div class="stat-num" id="statOn">0</div><div class="stat-label">启用中</div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#f9f0ff">💰</div><div><div class="stat-num" id="statAmt">0</div><div class="stat-label">满金额赠</div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#fff7e6">🔢</div><div><div class="stat-num" id="statQty">0</div><div class="stat-label">满件数赠</div></div></div>
+      </div>
+
+      <!-- List panel -->
+      <div class="panel">
+        <div class="page-header">
+          <div class="page-title">赠品规则列表</div>
+          <button class="btn btn-primary" onclick="openWizard()">＋ 新建满赠规则</button>
+        </div>
+        <div class="filter-bar">
+          <div class="filter-item"><label>玩法类型</label>
+            <select id="fPlay"><option value="">全部</option><option value="amount">满金额赠</option><option value="qty">满件数赠</option></select></div>
+          <div class="filter-item"><label>贸易类型</label>
+            <select id="fTrade"><option value="">全部</option><option value="general">一般贸易</option><option value="overseas">海外直邮</option><option value="bonded">保税仓</option></select></div>
+          <div class="filter-item"><label>状态</label>
+            <select id="fStatus"><option value="">全部</option><option value="on">启用中</option><option value="off">已停用</option></select></div>
+          <div class="filter-item"><label>规则名称</label>
+            <input id="fKw" placeholder="输入规则名称" style="width:180px" onkeydown="if(event.key==='Enter')renderList()"></div>
+          <div class="filter-item">
+            <button class="btn btn-primary" onclick="renderList()">🔍 查询</button>
+          </div>
+          <div class="filter-item">
+            <button class="btn btn-default" onclick="resetFilter()">重置</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>规则名称</th><th>玩法</th><th>贸易类型</th><th>门槛区间</th><th>商品范围</th><th>赠品配置</th><th>优先级</th><th>有效期</th><th>状态</th><th style="width:150px">操作</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ Wizard Modal ════════ -->
+<div class="fullpage" id="wizard">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="wizTitle">新建满赠规则</h3>
+      <button class="modal-close" onclick="closeWizard()" title="返回列表">×</button>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step active" data-step="1"><div class="step-num">1</div><div class="step-text"><div class="t">贸易类型与玩法</div><div class="d">选定贸易类型·门槛</div></div></div>
+      <div class="step" data-step="2"><div class="step-num">2</div><div class="step-text"><div class="t">商品参与范围</div><div class="d">圈定计入门槛商品</div></div></div>
+      <div class="step" data-step="3"><div class="step-num">3</div><div class="step-text"><div class="t">配置赠品</div><div class="d">来源·模式·数量</div></div></div>
+      <div class="step" data-step="4"><div class="step-num">4</div><div class="step-text"><div class="t">确认提交</div><div class="d">校验并保存</div></div></div>
+    </div>
+
+    <div class="modal-body">
+      <!-- ── Step 1 ── -->
+      <div class="step-panel show" data-panel="1">
+        <div class="alert alert-info"><span class="ic">💡</span><div>每条规则只对<b>一种贸易类型</b>生效，赠品须与规则同贸易类型。要覆盖多种贸易类型，请分别建多条规则。</div></div>
+
+        <div class="form-row">
+          <div class="form-item" id="w_name_box">
+            <label class="form-label">规则名称 <span class="req">*</span></label>
+            <input class="form-input" id="w_name" placeholder="例如：夏季满赠-A">
+            <div class="form-err">请输入规则名称</div>
+          </div>
+        </div>
+
+        <div class="section-title">① 贸易类型（单选，决定子单生效范围与赠品池）</div>
+        <div class="form-item" id="w_trade_box" style="margin-bottom:18px">
+          <div class="card-radio-group" id="w_trade">
+            <div class="card-radio" data-val="general" onclick="pickTrade('general')"><div class="ct">一般贸易</div></div>
+            <div class="card-radio" data-val="overseas" onclick="pickTrade('overseas')"><div class="ct">海外直邮</div></div>
+            <div class="card-radio" data-val="bonded" onclick="pickTrade('bonded')"><div class="ct">保税仓</div></div>
+          </div>
+          <div class="form-err">请选择贸易类型</div>
+        </div>
+
+        <div class="section-title">② 玩法类型（满金额赠 / 满件数赠，二者相容可并行）</div>
+        <div class="card-radio-group" id="w_play" style="margin-bottom:18px">
+          <div class="card-radio sel" data-val="amount" onclick="pickPlay('amount')"><div class="ct">满金额赠</div><div class="cd">按普通商品原价之和（有效金额）判断门槛</div></div>
+          <div class="card-radio" data-val="qty" onclick="pickPlay('qty')"><div class="ct">满件数赠</div><div class="cd">按普通商品件数之和（有效件数）判断门槛</div></div>
+        </div>
+
+        <div class="section-title">③ 门槛区间 <span class="req">*</span></div>
+        <div class="form-row">
+          <div class="form-item" id="w_min_box">
+            <label class="form-label"><span id="lblMin">最低金额</span> ～ 最高</label>
+            <div class="range">
+              <input class="form-input" id="w_min" type="number" min="0" placeholder="必填">
+              <span class="sep">～</span>
+              <input class="form-input" id="w_max" type="number" min="0" placeholder="最高（选填，空=无上限）">
+            </div>
+            <div class="form-hint">达到区间即触发赠送。<span id="hintUnit">有效金额=普通商品原价之和，不含满减/优惠券/运费/组合商品</span></div>
+            <div class="form-err">请输入有效的门槛（最低必填，且最高≥最低）</div>
+          </div>
+        </div>
+
+        <div class="section-title">④ 有效期 <span class="req">*</span></div>
+        <div class="form-row">
+          <div class="form-item">
+            <div class="range">
+              <input class="form-input" id="w_start" type="date">
+              <span class="sep">至</span>
+              <input class="form-input" id="w_end" type="date">
+              <label class="radio-item" style="white-space:nowrap;margin-left:10px"><input type="checkbox" id="w_longterm" onchange="toggleLongTerm()">长期</label>
+            </div>
+            <div class="form-hint" id="ltHint" style="display:none">长期活动：任何时间都有效；仍需与同类型规则比较优先级大小</div>
+            <div class="form-err">请选择有效期（结束需晚于开始）</div>
+          </div>
+        </div>
+
+        <div class="section-title">⑤ 优先级 <span class="req">*</span></div>
+        <div class="form-row">
+          <div class="form-item">
+            <input class="form-input" id="w_priority" type="number" min="1" value="10" style="width:200px">
+            <div class="form-hint" style="white-space:nowrap">数字越小越优先；同玩法类型、同贸易类型且有效期重叠时，不可设置相同优先级</div>
+          </div>
+        </div>
+        <div class="alert alert-info"><span class="ic">ℹ️</span><div><b>同玩法 + 同贸易类型</b>的规则有效期重叠时，只触发其中一条：取<b>启用中、当前在有效期内、优先级最小</b>的那条，其余忽略。不同玩法或不同贸易类型互不影响，可同时触发。</div></div>
+        <div class="alert alert-info"><span class="ic">🔒</span><div>赠品统一<b>付款成功时锁定</b>（普通订单付款 / 预售付定金均按付款节点）。</div></div>
+      </div>
+
+      <!-- ── Step 2 ── -->
+      <div class="step-panel" data-panel="2">
+        <div class="alert alert-info"><span class="ic">💡</span><div>在贸易类型 <b id="s2trade">—</b> 下圈定<b>计入门槛</b>的商品；<b>组合商品不参与</b>（也不能作赠品）。</div></div>
+
+        <div class="section-title">商品参与范围（4种方式）</div>
+        <div class="radio-group" style="margin-bottom:16px">
+          <label class="radio-item"><input type="radio" name="scope" value="all" checked onchange="pickScope('all')">① 该贸易类型全部商品</label>
+          <label class="radio-item"><input type="radio" name="scope" value="include" onchange="pickScope('include')">② 指定具体商品（规格编码）</label>
+          <label class="radio-item"><input type="radio" name="scope" value="exclude" onchange="pickScope('exclude')">③ 指定商品以外（排除）</label>
+          <label class="radio-item"><input type="radio" name="scope" value="category" onchange="pickScope('category')">④ 按商品分类</label>
+        </div>
+
+        <!-- all -->
+        <div id="scope_all" class="scope-pane">
+          <div class="alert alert-info"><span class="ic">✅</span><div>该贸易类型下<b>所有商品</b>均参与门槛计算。</div></div>
+        </div>
+
+        <!-- include / exclude -->
+        <div id="scope_codes" class="scope-pane" style="display:none">
+          <div class="form-item">
+            <label class="form-label"><span id="codesLbl">指定参与的规格编码（SKU编码）</span></label>
+            <div class="sku-input-bar">
+              <input class="form-input" id="scopeCodeInput" placeholder="输入规格编码（一般13位/部分15位），多个用逗号、空格或换行分隔" onkeydown="if(event.key==='Enter'){event.preventDefault();resolveScopeCodes();}">
+              <button class="btn btn-primary btn-sm" onclick="resolveScopeCodes()">🔍 解析查询</button>
+              <button class="btn btn-default btn-sm" onclick="openImport('scope')">📥 批量导入</button>
+            </div>
+            <div class="form-hint" style="margin-top:6px">⚠️ 请输入「规格编码」而非「商品编码」；解析时自动去空格、转大写、去重。编码较多时建议用「批量导入」。点击结果行「×」删除对应条码。</div>
+            <div id="scopeResult"></div>
+          </div>
+        </div>
+
+        <!-- category -->
+        <div id="scope_category" class="scope-pane" style="display:none">
+          <div class="form-row">
+            <div class="form-item"><label class="form-label">一级分类</label>
+              <select class="form-select" id="catL1" onchange="onCatL1()"></select></div>
+            <div class="form-item"><label class="form-label">二级分类</label>
+              <select class="form-select" id="catL2" onchange="onCatL2()"></select></div>
+            <div class="form-item"><label class="form-label">三级分类</label>
+              <select class="form-select" id="catL3" onchange="catUpdatePreview()"></select></div>
+          </div>
+          <div class="alert alert-info" id="catPreview"><span class="ic">🏷️</span><div>选择一个<b>大分类</b>即可（如「动漫周边」），其下全部子类商品都将参与；也可继续细化到二级/三级。组合商品除外。</div></div>
+        </div>
+      </div>
+
+      <!-- ── Step 3 ── -->
+      <div class="step-panel" data-panel="3">
+        <div class="alert alert-info"><span class="ic">🎁</span><div>赠品须存在于商品资料、与规则同贸易类型 <b id="s3trade">—</b>，组合商品除外。<br><b>填 1 个 = 单种固定；填多个 = 多种随机发（按编码数量自动判定）。</b></div></div>
+
+        <div class="section-title" style="margin-top:0">赠品规格编码与数量</div>
+        <div class="sku-input-bar" style="padding:0;background:none;border:none">
+          <input class="form-input" id="giftCodeInput" placeholder="输入赠品规格编码（一般13位/部分15位），多个用逗号、空格或换行分隔" onkeydown="if(event.key==='Enter'){event.preventDefault();resolveGiftCodes();}">
+          <button class="btn btn-primary btn-sm" onclick="resolveGiftCodes()">🔍 解析查询</button>
+          <button class="btn btn-default btn-sm" onclick="openImport('gift')">📥 批量导入</button>
+        </div>
+        <div class="form-hint" style="margin-top:6px">解析时自动去空格、转大写、去重；编码较多时建议用「批量导入」。点击结果行「×」删除对应赠品。</div>
+        <div id="giftResult"></div>
+        <div class="alert alert-warn" id="randomHint" style="display:none;margin-top:10px"><span class="ic">🎲</span><div>当前为<b>多种随机发</b>：满足门槛时从<b>有库存</b>的赠品中随机发 1 种；若全部无库存则本次不赠。</div></div>
+        <div class="form-err" id="giftErr" style="margin-top:8px">请至少配置一个有效赠品。</div>
+      </div>
+
+      <!-- ── Step 4 ── -->
+      <div class="step-panel" data-panel="4">
+        <div class="alert alert-info"><span class="ic">📋</span><div>核对配置后保存，系统将自动校验贸易类型、门槛与<b>优先级冲突</b>。</div></div>
+        <div id="confirmArea"></div>
+        <div class="alert alert-red" id="conflictBox" style="display:none"><span class="ic">🚫</span><div id="conflictMsg"></div></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="footer-inner">
+        <button class="btn btn-default" onclick="closeWizard()">取消</button>
+        <button class="btn btn-default" id="btnPrev" onclick="prevStep()" style="display:none">上一步</button>
+        <button class="btn btn-primary" id="btnNext" onclick="nextStep()">下一步</button>
+        <button class="btn btn-primary" id="btnSave" onclick="saveRule()" style="display:none">✓ 保存规则</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ Detail Modal ════════ -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal modal-sm" style="width:560px">
+    <div class="modal-header"><h3>规则详情</h3><button class="modal-close" onclick="closeModal('detailModal')">×</button></div>
+    <div class="modal-body"><div class="detail-grid" id="detailGrid"></div></div>
+    <div class="modal-footer"><div class="spacer"></div><button class="btn btn-default" onclick="closeModal('detailModal')">关闭</button></div>
+  </div>
+</div>
+
+<!-- ════════ Confirm Modal ════════ -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal modal-sm">
+    <div class="modal-header"><h3 id="confirmTitle">确认操作</h3><button class="modal-close" onclick="closeModal('confirmModal')">×</button></div>
+    <div class="modal-body"><div style="padding:22px;font-size:14px;color:#444" id="confirmText"></div></div>
+    <div class="modal-footer"><div class="spacer"></div><button class="btn btn-default" onclick="closeModal('confirmModal')">取消</button><button class="btn btn-danger" id="confirmOk">确认删除</button></div>
+  </div>
+</div>
+
+<!-- ════════ 批量导入 Modal ════════ -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal modal-sm" style="width:580px">
+    <div class="modal-header"><h3 id="importTitle">批量导入规格编码</h3><button class="modal-close" onclick="closeModal('importModal')">×</button></div>
+    <div class="modal-body" style="padding:20px">
+      <div class="alert alert-info"><span class="ic">📥</span><div>粘贴或上传编码，支持<b>逗号 / 空格 / 换行 / 分号 / 顿号</b>任意分隔；<br>系统自动去空格、转大写、去重后逐一解析查询。<br>单个编码 ≤32 位；指定/排除 ≤200 个、赠品 ≤20 个，超出部分不予添加。</div></div>
+      <div class="form-item" style="margin-bottom:14px">
+        <label class="form-label">上传文件（.xls / .csv / .txt）<button class="btn-link" style="margin-left:6px" onclick="downloadTemplate()">⬇ 下载导入模板</button></label>
+        <input type="file" id="importFile" accept=".xls,.csv,.txt" onchange="importFileChange(this)">
+        <div class="form-hint">建议先下载模板，按「规格编码」列填写后上传；也可直接复制 Excel 单元格粘贴到下方文本框。</div>
+      </div>
+      <div class="form-item">
+        <label class="form-label">编码内容</label>
+        <textarea class="form-textarea" id="importText" style="min-height:150px;font-family:monospace" placeholder="例如：&#10;6901234567890&#10;6901234567891, 6901234567892&#10;690123456789015" oninput="updateImportCount()"></textarea>
+        <div class="form-hint" id="importCount">已识别 0 个编码</div>
+      </div>
+    </div>
+    <div class="modal-footer"><div class="spacer"></div><button class="btn btn-default" onclick="closeModal('importModal')">取消</button><button class="btn btn-primary" onclick="doImport()">导入并解析</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="ti">✅</span><span id="toastMsg"></span></div>
+
+<script>
+/* ════════════════ Mock 商品/SKU 数据库（按贸易类型隔离） ════════════════ */
+const SKU_DB = {
+  // 一般贸易
+  'SKU-001': { name:'国产玫瑰口红（正红）', trade:'general', source:'onsale', stock:120, sale:'现货', price:89,  icon:'💄' },
+  'SKU-002': { name:'国产护唇膏（保湿）',   trade:'general', source:'onsale', stock:0,   sale:'现货', price:39,  icon:'🧴' },
+  'SKU-003': { name:'氨基酸洁面乳 100g',    trade:'general', source:'onsale', stock:88,  sale:'预售', price:59,  icon:'🧼' },
+  'GIFT-008':{ name:'专属礼品小样（定制）',  trade:'general', source:'archive',stock:300, sale:'现货', price:0,   icon:'🎀' },
+  // 海外直邮
+  'SKU-088': { name:'进口精华液 30ml',      trade:'overseas',source:'onsale', stock:45,  sale:'现货', price:299, icon:'💧' },
+  'SKU-089': { name:'进口面膜 5片装',       trade:'overseas',source:'onsale', stock:0,   sale:'预售', price:120, icon:'🎭' },
+  'GIFT-021':{ name:'直邮专属化妆包',        trade:'overseas',source:'archive',stock:60,  sale:'现货', price:0,   icon:'👜' },
+  // 保税仓
+  'SKU-055': { name:'保税区身体乳 250ml',   trade:'bonded',  source:'onsale', stock:30,  sale:'现货', price:159, icon:'🧴' },
+  'SKU-056': { name:'保税区防晒霜 SPF50',   trade:'bonded',  source:'onsale', stock:15,  sale:'预售', price:99,  icon:'☀️' },
+  'GIFT-033':{ name:'保税专属旅行装',        trade:'bonded',  source:'archive',stock:0,   sale:'现货', price:0,   icon:'✈️' },
+  // 组合商品（不参与满赠：既不计入门槛，也不能作为赠品）
+  'SET-001': { name:'人气手办三件套（组合）', trade:'general', source:'onsale', stock:40, sale:'现货', price:399, combo:true, icon:'📦' },
+  'SET-088': { name:'直邮护肤套装（组合）',   trade:'overseas',source:'onsale', stock:20, sale:'预售', price:599, combo:true, icon:'📦' },
+};
+/* ───── 商品分类树（编号内部保存，下拉只显示名称） ───── */
+const CATEGORY_TREE = [
+  { code:'1091', name:'动漫周边', children:[
+    { code:'1092', name:'手办雕像', children:[
+      {code:'1093',name:'其他'},{code:'1094',name:'比例手办'},{code:'1095',name:'Q版手办'},
+      {code:'1096',name:'可动手办'},{code:'1124',name:'雕像'},{code:'1128',name:'粘土人'},
+      {code:'1129',name:'BJD人偶'},{code:'1130',name:'兵人'},{code:'1131',name:'胶人人偶'},{code:'1140',name:'配件'} ]},
+    { code:'1097', name:'模型玩具', children:[
+      {code:'1098',name:'真实模型'},{code:'1099',name:'拼装模型'},{code:'1126',name:'儿童玩具'},{code:'1132',name:'拼装高达'} ]},
+    { code:'1101', name:'玩偶娃娃', children:[
+      {code:'1102',name:'毛绒布偶'},{code:'1103',name:'可动娃娃'} ]},
+    { code:'1104', name:'TCG卡牌', children:[
+      {code:'1105',name:'收藏类'},{code:'1133',name:'大赛类'} ]},
+    { code:'1106', name:'日用周边', children:[
+      {code:'1107',name:'谷子'},{code:'1108',name:'抱枕'},{code:'1109',name:'日用品'},{code:'1110',name:'文创文具'},
+      {code:'1111',name:'痛包'},{code:'1112',name:'手机PC用'},{code:'1134',name:'毛绒公仔'},{code:'1135',name:'家居用品'},
+      {code:'1145',name:'日用杂物'},{code:'1146',name:'数码周边'},{code:'1147',name:'文具文创'} ]},
+    { code:'1113', name:'一番赏盲盒', children:[
+      {code:'1114',name:'一番赏'},{code:'1115',name:'玛鲁赏'},{code:'1116',name:'盒蛋'},{code:'1127',name:'扭蛋'},{code:'1139',name:'潮玩盲盒'} ]},
+    { code:'1136', name:'谷子', children:[
+      {code:'1137',name:'挂画/贴纸'},{code:'1138',name:'棉花娃娃'},{code:'1141',name:'吧唧'},{code:'1142',name:'立牌'},
+      {code:'1143',name:'色纸'},{code:'1144',name:'痛包'},{code:'1348',name:'食玩'} ]},
+  ]},
+];
+const TRADE_LABEL = { general:'一般贸易', overseas:'海外直邮', bonded:'保税仓' };
+const TRADE_TAG   = { general:'tag-blue', overseas:'tag-cyan', bonded:'tag-purple' };
+const PLAY_LABEL  = { amount:'满金额赠', qty:'满件数赠' };
+const SOURCE_LABEL= { onsale:'已上架商品', archive:'商品资料' };
+
+/* ════════════════ 初始示例规则（对应说明书 4.5 示例） ════════════════ */
+let RULES = [
+  { id:1, name:'夏季满赠-A', play:'amount', trade:'general', min:300, max:null, priority:5,
+    start:'2026-06-01', end:'2026-08-31', ordertype:'normal', status:true,
+    scope:{type:'all'}, source:'onsale', giftMode:'random',
+    gifts:[{code:'SKU-001',qty:1},{code:'SKU-003',qty:1},{code:'GIFT-008',qty:2}] },
+  { id:2, name:'夏季满赠-B', play:'amount', trade:'overseas', min:300, max:null, priority:5,
+    start:'2026-06-01', end:'2026-08-31', ordertype:'normal', status:true,
+    scope:{type:'all'}, source:'onsale', giftMode:'single', gifts:[{code:'SKU-088',qty:1}] },
+  { id:3, name:'夏季满赠-C', play:'amount', trade:'bonded', min:300, max:null, priority:5,
+    start:'2026-06-01', end:'2026-08-31', ordertype:'normal', status:true,
+    scope:{type:'include', codes:['SKU-055','SKU-056']}, source:'onsale', giftMode:'single', gifts:[{code:'SKU-055',qty:1}] },
+  { id:4, name:'满10件送惊喜', play:'qty', trade:'general', min:10, max:null, priority:8,
+    start:'2026-05-01', end:'2026-12-31', longTerm:true, status:false,
+    scope:{type:'all'}, source:'archive', giftMode:'single', gifts:[{code:'GIFT-008',qty:1}] },
+];
+let SEQ = 100;
+
+/* ════════════════ 向导状态 ════════════════ */
+let wiz = null;          // 当前编辑中的规则草稿
+let editingId = null;    // 非空=编辑模式
+let curStep = 1;
+
+/* ────────── 列表渲染 ────────── */
+function renderList(){
+  const fPlay=val('fPlay'), fTrade=val('fTrade'), fStatus=val('fStatus'), kw=val('fKw').trim();
+  const rows = RULES.filter(r=>
+    (!fPlay||r.play===fPlay) && (!fTrade||r.trade===fTrade) &&
+    (!fStatus|| (fStatus==='on'?r.status:!r.status)) &&
+    (!kw||r.name.includes(kw))
+  );
+  const tb=document.getElementById('tbody');
+  if(!rows.length){ tb.innerHTML=`<tr><td colspan="10"><div class="empty"><div class="big">🗂️</div><div>暂无符合条件的规则</div></div></td></tr>`; }
+  else tb.innerHTML = rows.map(r=>{
+    const thr = r.play==='amount'
+      ? `¥${r.min}${r.max!=null?` ~ ¥${r.max}`:' 起'}`
+      : `${r.min}件${r.max!=null?` ~ ${r.max}件`:' 起'}`;
+    const scope = scopeText(r.scope);
+    const giftN = r.gifts.length;
+    const giftTxt = r.giftMode==='random'
+      ? `<span class="tag tag-orange">随机发</span>`
+      : `<span class="tag tag-blue">单种发</span>`;
+    return `<tr>
+      <td><div class="rule-name">${esc(r.name)}</div><div class="rule-sub">付款锁定</div></td>
+      <td><span class="tag ${r.play==='amount'?'tag-purple':'tag-orange'}">${PLAY_LABEL[r.play]}</span></td>
+      <td><span class="tag ${TRADE_TAG[r.trade]}">${TRADE_LABEL[r.trade]}</span></td>
+      <td>${thr}</td>
+      <td>${scope}</td>
+      <td>${giftTxt}</td>
+      <td><b>${r.priority}</b></td>
+      <td style="font-size:12px;color:#888">${r.longTerm?'<span class="tag tag-purple">长期</span>':r.start+'<br>~ '+r.end}</td>
+      <td><label class="switch"><input type="checkbox" ${r.status?'checked':''} onchange="toggleStatus(${r.id})"><span class="slider"></span></label></td>
+      <td><div class="ops">
+        <button class="btn-link" onclick="showDetail(${r.id})">详情</button>
+        <button class="btn-link" onclick="openWizard(${r.id})">编辑</button>
+        <button class="btn-link" onclick="copyRule(${r.id})">复制</button>
+        <button class="btn-link danger" onclick="askDelete(${r.id})">删除</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  // stats
+  document.getElementById('statTotal').textContent=RULES.length;
+  document.getElementById('statOn').textContent=RULES.filter(r=>r.status).length;
+  document.getElementById('statAmt').textContent=RULES.filter(r=>r.play==='amount').length;
+  document.getElementById('statQty').textContent=RULES.filter(r=>r.play==='qty').length;
+}
+function resetFilter(){ setVal('fPlay',''); setVal('fTrade',''); setVal('fStatus',''); setVal('fKw',''); renderList(); }
+function scopeText(s){
+  if(s.type==='all') return '<span class="tag tag-green">全部商品</span>';
+  if(s.type==='include') return `<span class="tag tag-blue">指定商品</span>`;
+  if(s.type==='exclude') return `<span class="tag tag-orange">除指定外</span>`;
+  if(s.type==='category') return `<span class="tag tag-cyan">分类商品</span>`;
+  return '—';
+}
+
+/* ────────── 状态/删除/复制 ────────── */
+function toggleStatus(id){ const r=RULES.find(x=>x.id===id); r.status=!r.status; renderList(); toast(`已${r.status?'启用':'停用'}「${r.name}」`); }
+let delId=null;
+function askDelete(id){ delId=id; const r=RULES.find(x=>x.id===id);
+  document.getElementById('confirmTitle').textContent='删除规则';
+  document.getElementById('confirmText').innerHTML=`确定删除规则「<b>${esc(r.name)}</b>」吗？删除后不可恢复。`;
+  document.getElementById('confirmOk').onclick=()=>{ RULES=RULES.filter(x=>x.id!==delId); closeModal('confirmModal'); renderList(); toast('规则已删除'); };
+  show('confirmModal');
+}
+function copyRule(id){ const r=RULES.find(x=>x.id===id); const c=JSON.parse(JSON.stringify(r)); c.id=++SEQ; c.name=r.name+'（副本）'; c.status=false; RULES.unshift(c); renderList(); toast('已复制规则，请编辑后启用'); }
+
+/* ────────── 详情 ────────── */
+function showDetail(id){
+  const r=RULES.find(x=>x.id===id);
+  const giftRows=r.gifts.map(g=>{const s=SKU_DB[g.code]; return `${g.code} ${s?s.name:''}`;}).join('<br>');
+  const rows=[
+    ['规则名称', esc(r.name)],
+    ['玩法类型', PLAY_LABEL[r.play]],
+    ['贸易类型', `<span class="tag ${TRADE_TAG[r.trade]}">${TRADE_LABEL[r.trade]}</span>`],
+    ['门槛区间', r.play==='amount'?`¥${r.min} ~ ${r.max!=null?'¥'+r.max:'无上限'}`:`${r.min} ~ ${r.max!=null?r.max+'件':'无上限'}`],
+    ['优先级', r.priority],
+    ['有效期', r.longTerm?'<span class="tag tag-purple">长期</span>（任何时间有效）':`${r.start} 至 ${r.end}`],
+    ['锁定时机', '付款成功后锁定赠品（普通/预售均按付款节点）'],
+    ['商品范围', scopeText(r.scope) + (r.scope.type==='category' && r.scope.path?'　'+r.scope.path:'')],
+    ['赠品模式', r.giftMode==='random'?'多种随机发（从有库存中随机1种）':'单种固定赠送'],
+    ['赠品明细', giftRows],
+    ['状态', r.status?'<span class="tag tag-green">启用中</span>':'<span class="tag tag-gray">已停用</span>'],
+  ];
+  document.getElementById('detailGrid').innerHTML=rows.map(([k,v])=>`<div class="dk">${k}</div><div class="dv">${v}</div>`).join('');
+  show('detailModal');
+}
+
+/* ════════════════ 向导 ════════════════ */
+function blankWiz(){ return { name:'', trade:null, play:'amount', min:'', max:'', priority:10,
+  start:'', end:'', longTerm:false, scope:{type:'all'}, scopeCodes:[],
+  gifts:[] }; }
+function toggleLongTerm(){
+  const on=document.getElementById('w_longterm').checked;
+  wiz.longTerm=on;
+  document.getElementById('w_start').disabled=on;
+  document.getElementById('w_end').disabled=on;
+  document.getElementById('ltHint').style.display=on?'block':'none';
+  if(on) clearRange();
+}
+
+function openWizard(id){
+  editingId = id||null;
+  if(id){ const r=RULES.find(x=>x.id===id); wiz=JSON.parse(JSON.stringify(r));
+    wiz.scopeCodes = r.scope.codes? r.scope.codes.map(c=>({code:c, ok:!!SKU_DB[c] && SKU_DB[c].trade===r.trade})) : [];
+    document.getElementById('wizTitle').textContent='编辑规则：'+r.name;
+  } else { wiz=blankWiz(); document.getElementById('wizTitle').textContent='新建满赠规则'; }
+  curStep=1;
+  hydrateStep1();
+  gotoStep(1);
+  show('wizard');
+}
+function closeWizard(){ closeModal('wizard'); }
+
+function hydrateStep1(){
+  setVal('w_name', wiz.name); setVal('w_min', wiz.min); setVal('w_max', wiz.max);
+  setVal('w_priority', wiz.priority); setVal('w_start', wiz.start); setVal('w_end', wiz.end);
+  document.getElementById('w_longterm').checked = !!wiz.longTerm;
+  toggleLongTerm();
+  // trade cards
+  document.querySelectorAll('#w_trade .card-radio').forEach(c=>c.classList.toggle('sel', c.dataset.val===wiz.trade));
+  document.querySelectorAll('#w_play .card-radio').forEach(c=>c.classList.toggle('sel', c.dataset.val===wiz.play));
+  applyPlayLabels();
+}
+
+/* step 1 pickers */
+function pickTrade(t){
+  if(wiz.trade && wiz.trade!==t && (wiz.scopeCodes.length || wiz.gifts.length)){
+    if(!confirm('切换贸易类型将清空已选的商品范围编码和赠品（贸易类型必须一致），是否继续？')){ return; }
+    wiz.scopeCodes=[]; wiz.gifts=[];
+  }
+  wiz.trade=t;
+  document.querySelectorAll('#w_trade .card-radio').forEach(c=>c.classList.toggle('sel', c.dataset.val===t));
+  clearErr('w_trade_box');
+  // 整页式：贸易类型变更后联动刷新提示与已选项
+  var a=document.getElementById('s2trade'), b=document.getElementById('s3trade');
+  if(a)a.textContent=TRADE_LABEL[t]; if(b)b.textContent=TRADE_LABEL[t];
+  if(document.getElementById('scopeResult')) renderScopeResult();
+  if(document.getElementById('giftResult')) renderGiftList();
+}
+function pickPlay(p){ wiz.play=p; document.querySelectorAll('#w_play .card-radio').forEach(c=>c.classList.toggle('sel', c.dataset.val===p)); applyPlayLabels(); }
+function applyPlayLabels(){
+  const amt = wiz.play==='amount';
+  document.getElementById('lblMin').textContent = amt?'最低金额':'最低件数';
+  document.getElementById('hintUnit').textContent = amt
+    ? '有效金额=普通商品原价之和，不含满减/优惠券/运费/组合商品'
+    : '有效件数=普通商品件数之和（不含组合商品）';
+  setPh('w_min', amt?'必填，如 300':'必填，如 10');
+  setPh('w_max', amt?'最高金额（选填，空=无上限）':'最高件数（选填，空=无上限）');
+}
+
+/* step 2 pickers */
+function pickScope(type){
+  // 真正切换方式时，重置当前方式的已选项（导航返回同一方式则保留）
+  const changed = wiz.scope.type !== type;
+  if(changed){ wiz.scope={type}; wiz.scopeCodes=[]; setVal('scopeCodeInput',''); }
+  else wiz.scope.type=type;
+  document.getElementById('scope_all').style.display = type==='all'?'block':'none';
+  document.getElementById('scope_codes').style.display = (type==='include'||type==='exclude')?'block':'none';
+  document.getElementById('scope_category').style.display = type==='category'?'block':'none';
+  if(type==='category') initCategory(wiz.scope&&wiz.scope.l1?wiz.scope:null);
+  document.getElementById('codesLbl').textContent = type==='exclude'?'指定需排除的规格编码（其余商品参与）':'指定参与的规格编码（SKU编码）';
+  renderScopeResult();
+}
+function resolveScopeCodes(){
+  const raw=val('scopeCodeInput'); if(!raw.trim())return;
+  const n=addScopeCodes(parseCodes(raw));
+  setVal('scopeCodeInput','');
+  if(n.added===0 && n.dup>0) toast('编码已存在，未重复添加');
+}
+// 把一批编码加入「商品范围」结果，返回统计
+function addScopeCodes(codes){
+  let added=0, dup=0, hasCombo=false, tooLong=0, overflow=0;
+  for(const code of codes){
+    if(wiz.scopeCodes.some(c=>c.code===code)){ dup++; continue; }
+    if(wiz.scopeCodes.length>=SCOPE_MAX){ overflow++; continue; }
+    if(code.length>CODE_MAXLEN){ wiz.scopeCodes.push({code, ok:false, reason:`编码超长(>${CODE_MAXLEN}位)`}); tooLong++; added++; continue; }
+    const s=SKU_DB[code];
+    const combo = !!s && s.combo;
+    if(combo) hasCombo=true;
+    const ok = !!s && s.trade===wiz.trade && !combo;
+    const reason = !s?'编码未找到':(combo?'组合商品不可参与':(s.trade!==wiz.trade?'贸易类型不一致':''));
+    wiz.scopeCodes.push({code, ok, reason}); added++;
+  }
+  renderScopeResult();
+  const warn=[];
+  if(hasCombo) warn.push('含组合商品，请移除');
+  if(tooLong)  warn.push(`${tooLong} 个编码超长(>${CODE_MAXLEN}位)，请检查后移除`);
+  if(overflow) warn.push(`超出上限 ${SCOPE_MAX} 个，${overflow} 个未添加`);
+  if(warn.length) toast(warn.join('；'),'err');
+  return {added, dup, warned:warn.length>0};
+}
+function renderScopeResult(){
+  const box=document.getElementById('scopeResult');
+  if(!wiz.scopeCodes.length){ box.innerHTML='<div class="code-empty">暂无查询结果，请输入规格编码后点击「解析查询」</div>'; return; }
+  const rows=wiz.scopeCodes.map((c,i)=>{
+    const s=SKU_DB[c.code];
+    const del=`<button class="code-del" title="删除该条码" onclick="rmScope(${i})">×</button>`;
+    if(c.code.length>CODE_MAXLEN) return `<tr class="err-row"><td><b>${esc(c.code.slice(0,20))}…</b></td><td colspan="4" style="color:#ff4d4f">编码超长(>${CODE_MAXLEN}位)，疑似多个编码未分隔或内容有误，请检查</td><td>${del}</td></tr>`;
+    if(!s) return `<tr class="err-row"><td><b>${esc(c.code)}</b></td><td colspan="4" style="color:#ff4d4f">编码未找到，请核查后重新输入</td><td>${del}</td></tr>`;
+    if(s.combo) return `<tr class="err-row">
+      <td><b>${esc(c.code)}</b></td>
+      <td colspan="4">${esc(s.name)} <span class="tag tag-red">组合商品</span> <span style="color:#ff4d4f;font-size:11px">组合商品不能参与满赠活动，请移除</span></td>
+      <td>${del}</td></tr>`;
+    const mismatch = s.trade!==wiz.trade;
+    const tradeCell = `<span class="tag ${TRADE_TAG[s.trade]}">${TRADE_LABEL[s.trade]}</span>`+(mismatch?' <span style="color:#ff4d4f;font-size:11px">与规则不一致</span>':'');
+    const saleCell = s.sale==='预售'?'<span class="tag tag-orange">预售</span>':'<span class="tag tag-green">现货</span>';
+    return `<tr class="${mismatch?'err-row':''}">
+      <td><b>${esc(c.code)}</b></td>
+      <td>${esc(s.name)}</td>
+      <td>${tradeCell}</td>
+      <td>${saleCell}</td>
+      <td>¥${s.price}</td>
+      <td>${del}</td>
+    </tr>`;
+  }).join('');
+  const valid=wiz.scopeCodes.filter(c=>c.ok).length, bad=wiz.scopeCodes.length-valid;
+  box.innerHTML=`
+    <div class="code-bar">
+      <span>共 <b>${wiz.scopeCodes.length}</b> 个编码　<span style="color:#52c41a">有效 ${valid}</span>${bad?`　<span style="color:#ff4d4f">异常 ${bad}</span>`:''}</span>
+      <button class="btn-link danger" onclick="clearScope()">清空全部</button>
+    </div>
+    <div class="code-scroll"><table class="code-table"><thead><tr>
+      <th>规格编码</th><th>商品名称</th><th>贸易类型</th><th>售卖方式</th><th>单价</th><th style="width:46px">操作</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function rmScope(i){ wiz.scopeCodes.splice(i,1); renderScopeResult(); }
+function clearScope(){ wiz.scopeCodes=[]; renderScopeResult(); }
+
+/* step 3：赠品 = 存在于商品资料即可添加；模式由编码数量自动判定 */
+function giftModeOf(){ return wiz.gifts.length>1?'random':'single'; }
+function syncGiftMode(){
+  document.getElementById('randomHint').style.display = giftModeOf()==='random'?'flex':'none';
+}
+function resolveGiftCodes(){
+  const raw=val('giftCodeInput'); if(!raw.trim())return;
+  const n=addGiftCodes(parseCodes(raw));
+  setVal('giftCodeInput','');
+  if(n.added===0 && n.dup>0) toast('赠品编码已存在，未重复添加');
+}
+// 把一批编码加入「赠品」结果，返回统计
+function addGiftCodes(codes){
+  let added=0, dup=0, hasCombo=false, tooLong=0, overflow=0;
+  for(const code of codes){
+    if(wiz.gifts.some(g=>g.code===code)){ dup++; continue; }
+    if(wiz.gifts.length>=GIFT_MAX){ overflow++; continue; }
+    if(code.length>CODE_MAXLEN){ wiz.gifts.push({code, qty:1}); tooLong++; added++; continue; }
+    const s=SKU_DB[code];
+    if(s && s.combo) hasCombo=true;
+    wiz.gifts.push({code, qty:1}); added++;
+  }
+  renderGiftList();
+  const warn=[];
+  if(hasCombo) warn.push('含组合商品，请移除');
+  if(tooLong)  warn.push(`${tooLong} 个编码超长(>${CODE_MAXLEN}位)，请检查后移除`);
+  if(overflow) warn.push(`赠品超出上限 ${GIFT_MAX} 个，${overflow} 个未添加`);
+  if(warn.length) toast(warn.join('；'),'err');
+  return {added, dup, warned:warn.length>0};
+}
+function renderGiftList(){
+  const box=document.getElementById('giftResult');
+  syncGiftMode();
+  if(!wiz.gifts.length){ box.innerHTML='<div class="code-empty">尚未添加赠品，请输入规格编码后点击「解析查询」</div>'; return; }
+  const rows=wiz.gifts.map((g,i)=>{
+    const s=SKU_DB[g.code];
+    const del=`<button class="code-del" title="删除该赠品" onclick="rmGift(${i})">×</button>`;
+    if(g.code.length>CODE_MAXLEN) return `<tr class="err-row"><td><b>${esc(g.code.slice(0,20))}…</b></td><td colspan="3" style="color:#ff4d4f">编码超长(>${CODE_MAXLEN}位)，疑似多个编码未分隔或内容有误，请检查</td><td>${del}</td></tr>`;
+    if(!s) return `<tr class="err-row"><td><b>${esc(g.code)}</b></td><td colspan="3" style="color:#ff4d4f">编码未找到（商品资料中不存在），请核查</td><td>${del}</td></tr>`;
+    if(s.combo) return `<tr class="err-row"><td><b>${esc(g.code)}</b></td><td colspan="3">${esc(s.name)} <span class="tag tag-red">组合商品</span> <span style="color:#ff4d4f;font-size:11px">组合商品不能作为赠品，请移除</span></td><td>${del}</td></tr>`;
+    const mismatch=s.trade!==wiz.trade;
+    const tradeCell=`<span class="tag ${TRADE_TAG[s.trade]}">${TRADE_LABEL[s.trade]}</span>`+(mismatch?' <span style="color:#ff4d4f;font-size:11px">与规则不一致</span>':'');
+    const stockCell=s.stock>0?`<span style="color:#52c41a">${s.stock}</span>`:`<span style="color:#ff4d4f">无库存</span>`;
+    return `<tr class="${mismatch?'err-row':''}">
+      <td><b>${esc(g.code)}</b></td>
+      <td>${esc(s.name)}</td>
+      <td>${tradeCell}</td>
+      <td>${stockCell}</td>
+      <td>${del}</td>
+    </tr>`;
+  }).join('');
+  const valid=wiz.gifts.filter(g=>{const s=SKU_DB[g.code]; return s&&!s.combo&&s.trade===wiz.trade;}).length;
+  const bad=wiz.gifts.length-valid;
+  const modeTag=giftModeOf()==='random'?'<span class="tag tag-orange">多种随机发</span>':'<span class="tag tag-blue">单种固定</span>';
+  box.innerHTML=`
+    <div class="code-bar">
+      <span>共 <b>${wiz.gifts.length}</b> 个赠品　当前模式：${modeTag}${bad?`　<span style="color:#ff4d4f">异常 ${bad}</span>`:''}</span>
+      <button class="btn-link danger" onclick="clearGifts()">清空全部</button>
+    </div>
+    <div class="code-scroll"><table class="code-table"><thead><tr>
+      <th>规格编码</th><th>商品名称</th><th>贸易类型</th><th>在库库存</th><th style="width:46px">操作</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function setGiftQty(i,v){ wiz.gifts[i].qty=Math.max(1, parseInt(v)||1); }
+function rmGift(i){ wiz.gifts.splice(i,1); renderGiftList(); }
+function clearGifts(){ wiz.gifts=[]; renderGiftList(); }
+
+/* ───── 批量导入（第2步范围 / 第3步赠品 共用） ───── */
+let importTarget=null;
+function openImport(target){
+  importTarget=target;
+  document.getElementById('importTitle').textContent = target==='gift'?'批量导入赠品规格编码':'批量导入规格编码';
+  setVal('importText',''); const f=document.getElementById('importFile'); if(f)f.value='';
+  updateImportCount();
+  show('importModal');
+}
+function importFileChange(input){
+  const file=input.files&&input.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    let text=e.target.result;
+    if(/<\s*(table|td|tr|html)\b/i.test(text)){          // .xls(HTML) → 转纯文本
+      text=text.replace(/<\s*br\s*\/?>/gi,'\n')
+               .replace(/<\/(tr|p|div|h\d)>/gi,'\n')
+               .replace(/<[^>]+>/g,' ')
+               .replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&');
+    }
+    const cur=val('importText'); setVal('importText',(cur?cur+'\n':'')+text); updateImportCount();
+  };
+  reader.readAsText(file);
+}
+function updateImportCount(){
+  document.getElementById('importCount').textContent='已识别 '+parseCodes(val('importText')).length+' 个编码';
+}
+function downloadTemplate(){
+  const html =
+    '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8">'
+    + '<!--[if gte mso 9]><xml>'
+    + '<x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
+    + '<x:Name>导入模板</x:Name>'
+    + '<x:WorksheetOptions><x:Selected/></x:WorksheetOptions>'   // 不含 DoNotDisplayGridlines → 显示整表网格线
+    + '</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook>'
+    + '</xml><![endif]-->'
+    + '<style>table{border-collapse:collapse;}td{mso-number-format:"\\@";font-family:微软雅黑;text-align:center;width:300px;height:22px;white-space:nowrap;}</style></head><body>'
+    + '<table cellspacing="0" cellpadding="6">'
+    + '<tr><td style="border:1px solid #000;background:#C6D9F1;font-weight:bold">规格编码</td></tr>'           // 第1行：名称（黑框）
+    + '<tr><td style="border:1px solid #000;background:#F2F2F2;color:#666">必填，规格编码（13或15位）</td></tr>'  // 第2行：注释（黑框）
+    + '<tr><td style="border:1px solid #000">3202511250006</td></tr>'                                          // 第3行：示例编码（黑框）
+    + new Array(30).fill('<tr><td>&nbsp;</td></tr>').join('')                                                  // 可填空行（无边框，仅显示整表网格线）
+    + '</table></body></html>';
+  const blob = new Blob(['﻿'+html], {type:'application/vnd.ms-excel;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '满赠规则_编码导入模板.xls';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+function doImport(){
+  const codes=parseCodes(val('importText'));
+  if(!codes.length){ toast('未识别到有效编码','err'); return; }
+  const res = importTarget==='gift'? addGiftCodes(codes) : addScopeCodes(codes);
+  closeModal('importModal');
+  if(!res.warned) toast(`导入完成：新增 ${res.added} 个${res.dup?`，重复跳过 ${res.dup} 个`:''}`);
+}
+
+/* ────────── 步骤导航 ────────── */
+function gotoStep(n){
+  curStep=n;
+  document.querySelectorAll('.step').forEach(s=>{
+    const k=+s.dataset.step;
+    s.classList.toggle('active', k===n);
+    s.classList.toggle('done', k<n);
+  });
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.toggle('show', +p.dataset.panel===n));
+  document.getElementById('btnPrev').style.display = n>1?'inline-flex':'none';
+  document.getElementById('btnNext').style.display = n<4?'inline-flex':'none';
+  document.getElementById('btnSave').style.display = n===4?'inline-flex':'none';
+  if(n===2){ document.getElementById('s2trade').textContent=wiz.trade?TRADE_LABEL[wiz.trade]:'—';
+    document.querySelector(`input[name=scope][value=${wiz.scope.type}]`).checked=true; pickScope(wiz.scope.type);
+    setVal('scopeCodeInput',''); }
+  if(n===3){ document.getElementById('s3trade').textContent=wiz.trade?TRADE_LABEL[wiz.trade]:'—';
+    renderGiftList(); }
+  if(n===4){ buildConfirm(); }
+}
+function prevStep(){ if(curStep>1) gotoStep(curStep-1); }
+function nextStep(){
+  if(!validateStep(curStep)) return;
+  // collect step values
+  if(curStep===1) collectStep1();
+  gotoStep(curStep+1);
+}
+
+function collectStep1(){
+  wiz.name=val('w_name').trim();
+  wiz.min=val('w_min'); wiz.max=val('w_max');
+  wiz.priority=parseInt(val('w_priority'))||1;
+  wiz.longTerm=document.getElementById('w_longterm').checked;
+  wiz.start=wiz.longTerm?'':val('w_start'); wiz.end=wiz.longTerm?'':val('w_end');
+}
+
+function validateStep(n){
+  if(n===1){
+    collectStep1(); let ok=true;
+    if(!wiz.name){ setErr('w_name_box'); ok=false; } else clearErr('w_name_box');
+    if(!wiz.trade){ setErr('w_trade_box'); ok=false; } else clearErr('w_trade_box');
+    const min=parseFloat(wiz.min), max=wiz.max===''?null:parseFloat(wiz.max);
+    if(wiz.min===''||isNaN(min)||min<0||(max!=null&&max<min)){ setErr('w_min_box'); ok=false; } else clearErr('w_min_box');
+    if(!wiz.longTerm && (!wiz.start||!wiz.end||wiz.end<wiz.start)){ setErr('w_start_box'); markRange(); ok=false; } else clearRange();
+    if(!ok) toast('请先完善必填项','err');
+    return ok;
+  }
+  if(n===2){
+    if((wiz.scope.type==='include'||wiz.scope.type==='exclude')){
+      const valid=wiz.scopeCodes.filter(c=>c.ok);
+      if(!valid.length){ toast('请先完善必填项','err'); return false; }
+      if(wiz.scopeCodes.some(c=>!c.ok)){ toast('存在无效编码（未找到 / 贸易类型不一致 / 组合商品），请先移除','err'); return false; }
+    }
+    if(wiz.scope.type==='category' && !val('catL1')){ toast('请先完善必填项','err'); return false; }
+    return true;
+  }
+  if(n===3){
+    const valid=wiz.gifts.filter(g=>{const s=SKU_DB[g.code]; return s && !s.combo && s.trade===wiz.trade;});
+    if(!valid.length){ document.getElementById('giftErr').style.display='block'; toast('请先完善必填项','err'); return false; }
+    if(wiz.gifts.some(g=>{const s=SKU_DB[g.code]; return !s || s.combo || s.trade!==wiz.trade;})){ toast('赠品中存在无效编码（未找到 / 贸易类型不一致 / 组合商品），请先移除','err'); return false; }
+    document.getElementById('giftErr').style.display='none';
+    return true;
+  }
+  return true;
+}
+function markRange(){ const s=document.getElementById('w_start').closest('.form-item'); if(s)s.classList.add('invalid'); }
+function clearRange(){ const s=document.getElementById('w_start').closest('.form-item'); if(s)s.classList.remove('invalid'); }
+
+/* ────────── 第4步确认 ────────── */
+function buildConfirm(){
+  const amt=wiz.play==='amount';
+  const thr = amt?`¥${wiz.min} ~ ${wiz.max!==''&&wiz.max!=null?'¥'+wiz.max:'无上限'}`:`${wiz.min} ~ ${wiz.max!==''&&wiz.max!=null?wiz.max+'件':'无上限'}`;
+  let scopeV;
+  if(wiz.scope.type==='all') scopeV='该贸易类型全部商品';
+  else if(wiz.scope.type==='category') scopeV='按商品分类'+(catScopeDesc()?'：'+catScopeDesc():'');
+  else scopeV=(wiz.scope.type==='exclude'?'排除：':'指定：')+wiz.scopeCodes.filter(c=>c.ok).map(c=>c.code).join(', ');
+  const gifts=wiz.gifts.map(g=>{const s=SKU_DB[g.code]; const stock=s&&s.stock>0?`库存${s.stock}`:'<span style="color:#ff4d4f">无库存</span>'; return `${g.code} ${s?s.name:''}（${stock}）`;}).join('<br>');
+  const allOOS = wiz.gifts.every(g=>!SKU_DB[g.code]||SKU_DB[g.code].stock<=0);
+  // 同玩法、有效期重叠、但优先级不同 → 允许共存，运行时按优先级取一条
+  const overlaps = RULES.filter(r=> r.id!==editingId && r.play===wiz.play && r.trade===wiz.trade
+    && r.priority!==(parseInt(wiz.priority)||1) && rangesOverlap(r, wiz));
+  const overlapNote = overlaps.length
+    ? `<div class="alert alert-info"><span class="ic">ℹ️</span><div>检测到 <b>${overlaps.length}</b> 条同玩法、同贸易类型（${TRADE_LABEL[wiz.trade]}）、有效期重叠的规则（优先级不同，<b>可共存保存</b>）：${overlaps.map(o=>`「${esc(o.name)}」优先级${o.priority}`).join('、')}。下单付款时将按「启用 + 当时在有效期内 + 优先级数字最小」自动取一条触发，其余忽略。</div></div>`
+    : '';
+
+  document.getElementById('confirmArea').innerHTML=`
+    <div class="summary-card"><div class="summary-head">基础与门槛</div><div class="summary-body">
+      <div class="summary-line"><div class="k">规则名称</div><div class="v"><b>${esc(wiz.name)}</b></div></div>
+      <div class="summary-line"><div class="k">玩法 / 贸易类型</div><div class="v"><span class="tag ${amt?'tag-purple':'tag-orange'}">${PLAY_LABEL[wiz.play]}</span> <span class="tag ${TRADE_TAG[wiz.trade]}">${TRADE_LABEL[wiz.trade]}</span></div></div>
+      <div class="summary-line"><div class="k">门槛区间</div><div class="v">${thr}</div></div>
+      <div class="summary-line"><div class="k">优先级</div><div class="v">${wiz.priority}</div></div>
+      <div class="summary-line"><div class="k">有效期</div><div class="v">${wiz.longTerm?'<span class="tag tag-purple">长期</span>（任何时间有效）':wiz.start+' 至 '+wiz.end}</div></div>
+      <div class="summary-line"><div class="k">锁定时机</div><div class="v">付款成功后锁定赠品（普通/预售均按付款节点）</div></div>
+    </div></div>
+    <div class="summary-card"><div class="summary-head">商品参与范围</div><div class="summary-body">
+      <div class="summary-line"><div class="k">范围方式</div><div class="v">${scopeV}</div></div>
+    </div></div>
+    <div class="summary-card"><div class="summary-head">赠品配置</div><div class="summary-body">
+      <div class="summary-line"><div class="k">赠品模式</div><div class="v">${giftModeOf()==='random'?'多种随机发（满足门槛随机发1种）':'单种固定赠送'}</div></div>
+      <div class="summary-line"><div class="k">赠品明细</div><div class="v">${gifts}</div></div>
+    </div></div>
+    ${overlapNote}
+    ${allOOS?'<div class="alert alert-warn"><span class="ic">⚠️</span><div>当前所有赠品均无库存：按缺货策略，达到门槛的订单本次将<b>不赠送</b>，库存恢复后新订单恢复赠送。</div></div>':''}
+  `;
+  // 冲突预检
+  const conflict = findConflict();
+  const box=document.getElementById('conflictBox');
+  if(conflict){ box.style.display='flex'; document.getElementById('conflictMsg').innerHTML=
+    `与规则「<b>${esc(conflict.name)}</b>」冲突：同为<b>${PLAY_LABEL[wiz.play]}</b>、同贸易类型<b>${TRADE_LABEL[wiz.trade]}</b>、有效期重叠且优先级均为 <b>${wiz.priority}</b>。同玩法+同贸易类型重叠期不允许相同优先级，请修改优先级或有效期。`;
+    document.getElementById('btnSave').disabled=true;
+  } else { box.style.display='none'; document.getElementById('btnSave').disabled=false; }
+}
+
+/* 同类型 + 时间重叠 + 同优先级 → 冲突（跨玩法允许相同优先级） */
+function findConflict(){
+  return RULES.find(r=> r.id!==editingId && r.play===wiz.play && r.trade===wiz.trade
+    && r.priority===(parseInt(wiz.priority)||1) && rangesOverlap(r, wiz));
+}
+// 长期活动与任意同类型规则都视为有效期重叠
+function rangesOverlap(a, b){
+  if(a.longTerm || b.longTerm) return true;
+  return a.start<=b.end && b.start<=a.end;
+}
+
+/* ────────── 保存（闭环） ────────── */
+function saveRule(){
+  if(findConflict()){ toast('存在优先级冲突，无法保存','err'); return; }
+  const rec={
+    id: editingId|| (++SEQ),
+    name: wiz.name, play: wiz.play, trade: wiz.trade,
+    min: parseFloat(wiz.min), max: wiz.max===''||wiz.max==null?null:parseFloat(wiz.max),
+    priority: parseInt(wiz.priority)||1, start: wiz.start, end: wiz.end, longTerm: !!wiz.longTerm,
+    status: editingId? RULES.find(r=>r.id===editingId).status : true,
+    scope: buildScope(), giftMode: giftModeOf(),
+    gifts: wiz.gifts.filter(g=>SKU_DB[g.code]).map(g=>({code:g.code, qty:g.qty})),
+  };
+  if(editingId){ const i=RULES.findIndex(r=>r.id===editingId); RULES[i]=rec; }
+  else RULES.unshift(rec);
+  closeWizard(); renderList();
+  toast(editingId?'规则已更新':'规则创建成功，已加入列表');
+}
+/* ───── 分类级联下拉 ───── */
+function catFill(id, nodes, ph){
+  document.getElementById(id).innerHTML='<option value="">'+ph+'</option>'+
+    (nodes||[]).map(n=>`<option value="${n.code}">${esc(n.name)}</option>`).join('');
+}
+function catFind(nodes, code){ return (nodes||[]).find(n=>n.code===code); }
+const CAT_ALL='全部（含下级分类）';
+function initCategory(sel){
+  catFill('catL1', CATEGORY_TREE, '请选择大分类');
+  catFill('catL2', [], CAT_ALL);
+  catFill('catL3', [], CAT_ALL);
+  if(sel && sel.l1){ setVal('catL1',sel.l1); onCatL1();
+    if(sel.l2){ setVal('catL2',sel.l2); onCatL2();
+      if(sel.l3) setVal('catL3',sel.l3); } }
+  catUpdatePreview();
+}
+function onCatL1(){
+  const node=catFind(CATEGORY_TREE, val('catL1'));
+  catFill('catL2', node?node.children:[], CAT_ALL);
+  catFill('catL3', [], CAT_ALL);
+  catUpdatePreview();
+}
+function onCatL2(){
+  const l1=catFind(CATEGORY_TREE, val('catL1'));
+  const node=l1?catFind(l1.children, val('catL2')):null;
+  catFill('catL3', node?node.children:[], CAT_ALL);
+  catUpdatePreview();
+}
+function catPathText(){
+  const l1=catFind(CATEGORY_TREE, val('catL1'));
+  const l2=l1?catFind(l1.children, val('catL2')):null;
+  const l3=l2?catFind(l2.children, val('catL3')):null;
+  return [l1&&l1.name, l2&&l2.name, l3&&l3.name].filter(Boolean).join(' / ');
+}
+/* 选中范围描述：止于某层 = 该层及其全部子类 */
+function catScopeDesc(){
+  const l1=catFind(CATEGORY_TREE, val('catL1'));
+  if(!l1) return '';
+  const l2=catFind(l1.children, val('catL2'));
+  if(!l2) return l1.name+' · 全部子类';
+  const l3=l2.children?catFind(l2.children, val('catL3')):null;
+  if(!l3) return l1.name+' / '+l2.name+' · 全部下级';
+  return l1.name+' / '+l2.name+' / '+l3.name;
+}
+function catUpdatePreview(){
+  const box=document.getElementById('catPreview');
+  const desc=catScopeDesc();
+  box.innerHTML = '<span class="ic">🏷️</span><div>'+(desc
+    ? '已选范围：<b>'+esc(desc)+'</b>　（组合商品除外）'
+    : '选择一个<b>大分类</b>即可（如「动漫周边」），其下全部子类商品都将参与；也可继续细化到二级/三级。组合商品除外。')+'</div>';
+}
+function buildScope(){
+  const t=wiz.scope.type;
+  if(t==='all') return {type:'all'};
+  if(t==='category') return {type:'category', l1:val('catL1'), l2:val('catL2'), l3:val('catL3'), path:catScopeDesc()};
+  return {type:t, codes: wiz.scopeCodes.filter(c=>c.ok).map(c=>c.code)};
+}
+
+/* ────────── 工具 ────────── */
+// 数量/长度上限
+const CODE_MAXLEN = 32;   // 单个编码最大长度（13/15位+缓冲）
+const SCOPE_MAX   = 200;  // 指定/排除编码数量上限
+const GIFT_MAX    = 20;   // 赠品编码数量上限
+// 支持 逗号(英/中) / 空格 / 换行 / 制表 / 分号 / 顿号 多种分隔；忽略 # 注释行与表头词；去空格、转大写、去重
+const CODE_IGNORE = new Set(['规格编码','编码','SKU编码','SKU','CODE','规格编码(SKU编码)']);
+function parseCodes(raw){
+  const out=[], seen=new Set();
+  raw.split(/\r?\n/).forEach(line=>{
+    if(line.trim().startsWith('#')) return;          // # 说明行，忽略
+    line.split(/[,，;；、\t ]+/).forEach(s=>{
+      const t=s.trim(); if(!t) return;
+      if(/[一-鿿]/.test(t)) return;          // 含中文（表头/注释）自动忽略
+      if(CODE_IGNORE.has(t)) return;                 // 表头词，忽略
+      const c=t.toUpperCase();
+      if(CODE_IGNORE.has(c)) return;
+      if(!seen.has(c)){ seen.add(c); out.push(c); }
+    });
+  });
+  return out;
+}
+function val(id){ return document.getElementById(id).value; }
+function setVal(id,v){ const e=document.getElementById(id); if(e)e.value=(v==null?'':v); }
+function setPh(id,v){ const e=document.getElementById(id); if(e)e.placeholder=v; }
+function setErr(boxId){ const b=document.getElementById(boxId); if(b){b.classList.add('invalid'); const e=b.querySelector('.form-err'); if(e)e.classList.add('show');} }
+function clearErr(boxId){ const b=document.getElementById(boxId); if(b){b.classList.remove('invalid'); const e=b.querySelector('.form-err'); if(e)e.classList.remove('show');} }
+function show(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+let toastT;
+function toast(msg,type){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=msg;
+  t.querySelector('.ti').textContent=type==='err'?'⚠️':'✅'; t.classList.toggle('err',type==='err');
+  t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* 给有效期 form-item 加 id 方便错误标记 */
+document.getElementById('w_start').closest('.form-item').id='w_start_box';
+
+/* init */
+renderList();
+</script>
+</body>
+</html>
