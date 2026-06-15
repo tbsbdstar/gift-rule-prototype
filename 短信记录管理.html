@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>短信记录管理 - 后台管理</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f0f2f5; color: #303133; font-size: 14px;
+  }
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ===== 左侧菜单 ===== */
+  .sidebar { width: 210px; background: #2b3648; color: #b3bdcc; flex-shrink: 0; }
+  .logo { height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 20px; color: #fff; font-size: 17px; font-weight: 600; }
+  .logo .dot { width: 26px; height: 26px; border-radius: 6px; background: #409eff; display:flex; align-items:center; justify-content:center; font-size:14px;}
+  .menu-sub { background: #232c3b; }
+  .menu-sub a { display: flex; align-items: center; gap: 10px; padding: 11px 20px 11px 46px; color: #aeb7c4; text-decoration: none; font-size: 13.5px; border-left: 3px solid transparent; }
+  .menu-sub a:hover { color: #fff; background:#1d2531; }
+  .menu-sub a.current { color: #fff; background: #1d2531; border-left-color: #409eff; }
+  .menu-title { display: flex; align-items: center; gap: 10px; padding: 13px 20px; color:#fff; cursor: pointer; }
+  .menu-flat { display:flex; align-items:center; gap:10px; padding: 13px 20px; color:#cfd6e0; cursor:pointer; }
+
+  /* ===== 主区域 ===== */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar { height: 56px; background: #fff; display: flex; align-items: center; padding: 0 24px; box-shadow: 0 1px 4px rgba(0,0,0,.06); justify-content: space-between; }
+  .topbar .crumb { color:#606266; font-weight:500;}
+  .topbar .right { color:#409eff; cursor:pointer; font-size:13px;}
+  .content { padding: 16px; }
+  .panel { background:#fff; border-radius:4px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+
+  /* ===== 查询区 ===== */
+  .filters { display:flex; flex-wrap:wrap; gap:14px 22px; align-items:center; }
+  .field { display:flex; align-items:center; gap:8px; position:relative; }
+  .field label { color:#606266; white-space:nowrap; }
+  .field input, .field select { height: 32px; border:1px solid #dcdfe6; border-radius:4px; padding:0 10px; font-size:13px; color:#606266; outline:none; background:#fff; }
+  .field input:focus, .field select:focus { border-color:#409eff; }
+  .field input.phone { width:150px; }
+  .field input.kw { width:180px; }
+  .field select { min-width:110px; cursor:pointer; }
+
+  /* 日期选择输入（只读，点击弹日历） */
+  .date-input { width:140px; cursor:pointer; background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23909399' stroke-width='2'><rect x='3' y='4' width='18' height='18' rx='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/></svg>") no-repeat 10px center; padding-left:30px !important; }
+  .date-input::placeholder { color:#c0c4cc; }
+
+  .quick { display:flex; gap:6px; }
+  .quick span { padding:4px 11px; border:1px solid #dcdfe6; border-radius:4px; cursor:pointer; color:#606266; font-size:13px; user-select:none; }
+  .quick span:hover { color:#409eff; }
+  .quick span.on { color:#409eff; border-color:#409eff; background:#ecf5ff; }
+
+  .btn { height:32px; padding:0 16px; border:none; border-radius:4px; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:5px; }
+  .btn-primary { background:#409eff; color:#fff; } .btn-primary:hover { background:#66b1ff; }
+  .btn-default { background:#fff; color:#606266; border:1px solid #dcdfe6; } .btn-default:hover { color:#409eff; border-color:#c6e2ff; }
+  .btn-success { background:#67c23a; color:#fff;} .btn-success:hover{ background:#85ce61;}
+
+  /* ===== 统计概览 ===== */
+  .stats { display:flex; gap:34px; margin:16px 0; padding:14px 20px; background:#fafcff; border:1px solid #ebeef5; border-radius:4px;}
+  .stats .item { display:flex; flex-direction:column; gap:4px;}
+  .stats .item .num { font-size:20px; font-weight:600; }
+  .stats .item .lbl { color:#909399; font-size:12px;}
+  .num.ok{color:#67c23a;} .num.fail{color:#f56c6c;} .num.rate{color:#409eff;} .num.sending{color:#909399;}
+
+  /* ===== 表格 ===== */
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead th { background:#f5f7fa; color:#606266; font-weight:600; text-align:left; padding:11px 12px; border-bottom:1px solid #ebeef5; white-space:nowrap; }
+  tbody td { padding:11px 12px; border-bottom:1px solid #ebeef5; color:#606266; vertical-align:middle;}
+  tbody tr:hover { background:#f5f7fa; }
+  .content-cell { max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .empty { text-align:center; color:#909399; padding:40px 0; }
+
+  .tag { display:inline-block; padding:1px 8px; border-radius:3px; font-size:12px; line-height:20px; white-space:nowrap; }
+  .tag-blue { background:#ecf5ff; color:#409eff; border:1px solid #d9ecff;}
+  .tag-purple{ background:#f5f0ff; color:#8a5cf6; border:1px solid #e6dcff;}
+  .tag-green { background:#f0f9eb; color:#67c23a; border:1px solid #e1f3d8;}
+  .tag-red   { background:#fef0f0; color:#f56c6c; border:1px solid #fde2e2;}
+  .tag-gray  { background:#f4f4f5; color:#909399; border:1px solid #e9e9eb;}
+
+  .link { color:#409eff; cursor:pointer; } .link:hover { text-decoration:underline; }
+  .eye { color:#909399; cursor:pointer; margin-left:4px; font-size:12px;}
+
+  .pager { display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-top:16px; color:#606266; font-size:13px;}
+  .pager .pg { min-width:28px; height:28px; line-height:28px; text-align:center; border:1px solid #dcdfe6; border-radius:4px; cursor:pointer; padding:0 6px;}
+  .pager .pg.on { background:#409eff; color:#fff; border-color:#409eff;}
+  .pager .pg.disabled { color:#c0c4cc; cursor:not-allowed; }
+
+  /* ===== 详情抽屉 ===== */
+  .mask { position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; z-index:50; }
+  .mask.show{ display:block; }
+  .drawer { position:fixed; top:0; right:-460px; width:440px; height:100%; background:#fff; z-index:51; box-shadow:-2px 0 12px rgba(0,0,0,.12); transition:right .25s; display:flex; flex-direction:column; }
+  .drawer.show { right:0; }
+  .drawer-head { padding:16px 20px; border-bottom:1px solid #ebeef5; display:flex; justify-content:space-between; align-items:center; font-size:16px; font-weight:600;}
+  .drawer-head .x { cursor:pointer; color:#909399; font-size:20px; }
+  .drawer-body { padding:8px 20px; overflow:auto; flex:1;}
+  .drow { display:flex; padding:13px 0; border-bottom:1px dashed #ebeef5; }
+  .drow .k { width:96px; color:#909399; flex-shrink:0;}
+  .drow .v { color:#303133; word-break:break-all; flex:1;}
+  .drow .v.content-full { background:#f8f9fb; padding:10px; border-radius:4px; line-height:1.6; }
+  .drawer-foot { padding:14px 20px; border-top:1px solid #ebeef5; display:flex; justify-content:flex-end; gap:10px;}
+
+  .notice { background:#fff6f0; border:1px solid #ffd9c2; color:#e6691a; padding:4px 14px; border-radius:16px; font-size:12.5px; max-width:520px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
+  /* ===== 日历弹层 ===== */
+  .cal { position:absolute; top:38px; left:0; z-index:60; width:252px; background:#fff; border:1px solid #e4e7ed; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,.12); padding:10px 12px; display:none; }
+  .cal.show { display:block; }
+  .cal-head { display:flex; align-items:center; justify-content:space-between; padding:4px 2px 8px; }
+  .cal-head .nav { cursor:pointer; color:#606266; width:26px; height:26px; line-height:26px; text-align:center; border-radius:4px; user-select:none; }
+  .cal-head .nav:hover { background:#f2f6fc; color:#409eff; }
+  .cal-head .ym { font-weight:600; color:#303133; display:flex; gap:10px; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-grid .wd { color:#c0c4cc; font-size:12px; text-align:center; height:28px; line-height:28px; }
+  .cal-grid .day { height:30px; line-height:30px; text-align:center; font-size:13px; color:#606266; border-radius:4px; cursor:pointer; user-select:none; }
+  .cal-grid .day:hover { background:#ecf5ff; color:#409eff; }
+  .cal-grid .day.other { color:#c0c4cc; }
+  .cal-grid .day.today { color:#409eff; font-weight:600; }
+  .cal-grid .day.selected { background:#409eff; color:#fff; }
+  .cal-foot { display:flex; justify-content:space-between; padding-top:8px; margin-top:6px; border-top:1px solid #f0f0f0; }
+  .cal-foot span { font-size:12px; color:#409eff; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo"><span class="dot">🛒</span> 后台管理</div>
+    <div class="menu-flat">📊 数据统计</div>
+    <div>
+      <div class="menu-title">⚙️ 系统设置 <span style="margin-left:auto;">⌄</span></div>
+      <div class="menu-sub">
+        <a href="#">账号管理</a><a href="#">角色权限管理</a><a href="#">菜单管理</a><a href="#">操作日志</a>
+        <a href="#" class="current">💬 短信记录管理</a>
+        <a href="#">收货人信息</a><a href="#">邮费模板</a><a href="#">汇率设置</a>
+      </div>
+    </div>
+    <div class="menu-flat">🗂️ 资料管理</div><div class="menu-flat">📦 商品管理</div>
+    <div class="menu-flat">📋 订单管理</div><div class="menu-flat">🛍️ 采购管理</div>
+    <div class="menu-flat">🏷️ 库存管理</div><div class="menu-flat">🧾 工单管理</div>
+    <div class="menu-flat">📣 营销中心</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">短信记录管理</div>
+      <div class="notice">注意：出货单中条码4571608526811是人工核对…</div>
+      <div class="right">退出登录</div>
+    </div>
+
+    <div class="content">
+      <div class="panel">
+        <!-- 查询区 -->
+        <div class="filters">
+          <div class="field"><label>手机号</label><input id="fPhone" class="phone" placeholder="请输入手机号" /></div>
+          <div class="field"><label>渠道</label>
+            <select id="fChannel"><option value="">全部</option><option>玛鲁丸</option><option>会员购</option></select>
+          </div>
+          <div class="field"><label>状态</label>
+            <select id="fStatus"><option value="">全部</option><option value="ok">发送成功</option><option value="fail">发送失败</option><option value="sending">发送中</option></select>
+          </div>
+          <div class="field"><label>内容关键词</label><input id="fKw" class="kw" placeholder="如：验证码 / 订单" /></div>
+
+          <div class="field"><label>发送时间</label>
+            <input id="fStart" class="date-input" readonly placeholder="开始日期" />
+            <div class="cal" id="calStart"></div>
+          </div>
+          <span style="color:#c0c4cc;">-</span>
+          <div class="field">
+            <input id="fEnd" class="date-input" readonly placeholder="结束日期" />
+            <div class="cal" id="calEnd"></div>
+          </div>
+
+          <div class="quick" id="quick">
+            <span data-q="today">今日</span><span data-q="week">本周</span><span data-q="month">本月</span><span data-q="year">今年</span>
+          </div>
+          <button class="btn btn-primary" onclick="doQuery()">🔍 查询</button>
+          <button class="btn btn-default" onclick="doReset()">重置</button>
+          <button class="btn btn-success" onclick="doExport()">⭳ 导出 Excel</button>
+        </div>
+
+        <!-- 统计概览 -->
+        <div class="stats">
+          <div class="item"><span class="num" id="sTotal">0</span><span class="lbl">发送总量</span></div>
+          <div class="item"><span class="num ok" id="sOk">0</span><span class="lbl">发送成功</span></div>
+          <div class="item"><span class="num fail" id="sFail">0</span><span class="lbl">发送失败</span></div>
+          <div class="item"><span class="num sending" id="sSend">0</span><span class="lbl">发送中</span></div>
+          <div class="item"><span class="num rate" id="sRate">0%</span><span class="lbl">成功率</span></div>
+        </div>
+
+        <!-- 表格 -->
+        <table>
+          <thead>
+            <tr>
+              <th>短信ID</th><th>手机号</th><th>短信内容</th><th>渠道</th>
+              <th>发送时间 ↓</th><th>状态</th><th>失败原因</th><th style="text-align:center;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+
+        <div class="pager" id="pager"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 详情抽屉 -->
+<div class="mask" id="mask" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">短信详情 <span class="x" onclick="closeDrawer()">×</span></div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot"><button class="btn btn-default" onclick="closeDrawer()">关闭</button></div>
+</div>
+
+<script>
+/* ================= 当前日期锚点（与示例数据匹配） ================= */
+const TODAY = new Date(2026, 5, 15); // 2026-06-15
+
+/* ================= 示例数据 ================= */
+const ALL = [
+  {id:'MSG20260615101205001', phone:'13812346789', content:'【杭州玛鲁丸】您的验证码为123456，10分钟内有效，请勿将验证码泄露给他人，如非本人操作，可不用理会。', ch:'玛鲁丸', time:'2026-06-15 10:12:05', status:'ok', reason:'', receipt:'DELIVRD（成功）', serial:'25061510120500abc', type:'验证码', biz:'会员注册'},
+  {id:'MSG20260615094430002', phone:'13900008888', content:'【杭州玛鲁丸】您的【新网球王子 半身亚克力立板】已入库，请前往商城支付尾款！', ch:'会员购', time:'2026-06-15 09:44:30', status:'ok', reason:'', receipt:'DELIVRD（成功）', serial:'25061509443002def', type:'业务通知', biz:'SO20260615001'},
+  {id:'MSG20260615090015003', phone:'13700001111', content:'【杭州玛鲁丸】谷谷穿上厚厚的衣服准备出发啦！您的【WARS 3 亚克力吧唧徽章】已打包，请前往商城支付运费!', ch:'玛鲁丸', time:'2026-06-15 09:00:15', status:'fail', reason:'号码无效', receipt:'REJECTED（号码无效）', serial:'25061509001503ghi', type:'业务通知', biz:'SO20260614022'},
+  {id:'MSG20260613161122004', phone:'13611112222', content:'【杭州玛鲁丸】您的【超时空辉夜 谷子套组】预约失败，请前往商城申请退款！', ch:'会员购', time:'2026-06-13 16:11:22', status:'ok', reason:'', receipt:'DELIVRD（成功）', serial:'25061316112204jkl', type:'业务通知', biz:'SO20260610005'},
+  {id:'MSG20260612130012005', phone:'13533334444', content:'【杭州玛鲁丸】不要小瞧我们之间的羁绊啊!您的订单SO20260601008已囤货30天，请注意在剩余15天内申请发货，逾期订单将取消。', ch:'玛鲁丸', time:'2026-06-12 13:00:12', status:'fail', reason:'运营商通道异常', receipt:'FAILED（超时）', serial:'25061213001205mno', type:'催付提醒', biz:'SO20260601008'},
+  {id:'MSG20260610125530006', phone:'13455556666', content:'【杭州玛鲁丸】您有订单即将逾期，请在3天内支付尾款，未及时支付的订单将进行逾期处理，请及时支付。', ch:'会员购', time:'2026-06-10 12:55:30', status:'sending', reason:'', receipt:'等待回执…', serial:'25061012553006pqr', type:'催付提醒', biz:'SO20260528017'},
+  {id:'MSG20260605143300007', phone:'13822223333', content:'【杭州玛鲁丸】您有订单已逾期，订单将为您保留7天，请在7天内联系客服，7天后订单将取消，定金不予退回。', ch:'玛鲁丸', time:'2026-06-05 14:33:00', status:'ok', reason:'', receipt:'DELIVRD（成功）', serial:'25060514330007stu', type:'逾期提醒', biz:'SO20260520030'},
+  {id:'MSG20260603091045008', phone:'13966667777', content:'【杭州玛鲁丸】谷谷瑟瑟发抖…已打包订单将为您继续保留5天，逾期将产生保管费用，请及时支付!', ch:'会员购', time:'2026-06-03 09:10:45', status:'fail', reason:'号码停机', receipt:'FAILED（停机）', serial:'25060309104508vwx', type:'逾期提醒', biz:'SO20260522011'},
+  {id:'MSG20260520180022009', phone:'13744445555', content:'【杭州玛鲁丸】您的验证码为246810，10分钟内有效，请勿将验证码泄露给他人，如非本人操作，可不用理会。', ch:'玛鲁丸', time:'2026-05-20 18:00:22', status:'ok', reason:'', receipt:'DELIVRD（成功）', serial:'25052018002209yz0', type:'验证码', biz:'登录'},
+  {id:'MSG20260418142210010', phone:'13688889999', content:'【杭州玛鲁丸】您的【咒术回战 五条悟 立牌】已入库，请前往商城支付尾款！', ch:'会员购', time:'2026-04-18 14:22:10', status:'ok', reason:'', receipt:'DELIVRD（成功）', serial:'25041814221010aaa', type:'业务通知', biz:'SO20260410003'},
+  {id:'MSG20260205103300011', phone:'13511112233', content:'【杭州玛鲁丸】谷谷瑟瑟发抖…已打包订单将产生保管费用，请于今日内支付!3日后订单作废，金额不予退回!', ch:'玛鲁丸', time:'2026-02-05 10:33:00', status:'fail', reason:'运营商通道异常', receipt:'FAILED（超时）', serial:'25020510330011bbb', type:'逾期提醒', biz:'SO20260120044'},
+  {id:'MSG20251228090000012', phone:'13899990000', content:'【杭州玛鲁丸】您的验证码为778899，10分钟内有效，请勿将验证码泄露给他人，如非本人操作，可不用理会。', ch:'会员购', time:'2025-12-28 09:00:00', status:'ok', reason:'', receipt:'DELIVRD（成功）', serial:'25122809000012ccc', type:'验证码', biz:'会员注册'},
+];
+
+/* ================= 工具函数 ================= */
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmt(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function mask(p){ return p.slice(0,3)+'****'+p.slice(7); }
+function statusTag(s){
+  if(s==='ok') return '<span class="tag tag-green">● 发送成功</span>';
+  if(s==='fail') return '<span class="tag tag-red">● 发送失败</span>';
+  return '<span class="tag tag-gray">● 发送中</span>';
+}
+function chTag(c){ return '<span class="tag '+(c==='玛鲁丸'?'tag-blue':'tag-purple')+'">'+c+'</span>'; }
+
+/* ================= 过滤 + 渲染 ================= */
+let filtered = ALL.slice();
+let page = 1; const PAGE_SIZE = 8;
+
+function applyFilter(){
+  const phone = document.getElementById('fPhone').value.trim();
+  const ch = document.getElementById('fChannel').value;
+  const st = document.getElementById('fStatus').value;
+  const kw = document.getElementById('fKw').value.trim();
+  const start = document.getElementById('fStart').value;
+  const end = document.getElementById('fEnd').value;
+  filtered = ALL.filter(r=>{
+    if(phone && !r.phone.includes(phone)) return false;
+    if(ch && r.ch !== ch) return false;
+    if(st && r.status !== st) return false;
+    if(kw && !r.content.includes(kw)) return false;
+    const day = r.time.slice(0,10);
+    if(start && day < start) return false;
+    if(end && day > end) return false;
+    return true;
+  });
+  page = 1;
+  render();
+}
+
+function render(){
+  // 统计
+  const total = filtered.length;
+  const ok = filtered.filter(r=>r.status==='ok').length;
+  const fail = filtered.filter(r=>r.status==='fail').length;
+  const send = filtered.filter(r=>r.status==='sending').length;
+  document.getElementById('sTotal').textContent = total;
+  document.getElementById('sOk').textContent = ok;
+  document.getElementById('sFail').textContent = fail;
+  document.getElementById('sSend').textContent = send;
+  document.getElementById('sRate').textContent = total ? ((ok/total*100).toFixed(1)+'%') : '0%';
+
+  // 分页数据
+  const pages = Math.max(1, Math.ceil(total/PAGE_SIZE));
+  if(page>pages) page = pages;
+  const slice = filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
+
+  const tbody = document.getElementById('tbody');
+  if(total===0){
+    tbody.innerHTML = '<tr><td colspan="8" class="empty">暂无符合条件的短信记录</td></tr>';
+  } else {
+    tbody.innerHTML = slice.map(r=>{
+      const idx = ALL.indexOf(r);
+      return `<tr>
+        <td style="color:#909399;font-size:12px;">${r.id}</td>
+        <td>${mask(r.phone)}<span class="eye" title="查看完整号码(将记录操作日志)">👁</span></td>
+        <td class="content-cell" title="${r.content}">${r.content}</td>
+        <td>${chTag(r.ch)}</td>
+        <td>${r.time}</td>
+        <td>${statusTag(r.status)}</td>
+        <td>${r.reason ? '<span style="color:#f56c6c">'+r.reason+'</span>' : '—'}</td>
+        <td style="text-align:center;"><span class="link" onclick="openDrawer(${idx})">详情</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // 分页器
+  const pager = document.getElementById('pager');
+  let html = `<span>共 ${total} 条</span>`;
+  html += `<span class="pg ${page<=1?'disabled':''}" onclick="${page>1?'goPage('+(page-1)+')':''}">‹</span>`;
+  for(let i=1;i<=pages;i++){ html += `<span class="pg ${i===page?'on':''}" onclick="goPage(${i})">${i}</span>`; }
+  html += `<span class="pg ${page>=pages?'disabled':''}" onclick="${page<pages?'goPage('+(page+1)+')':''}">›</span>`;
+  html += `<span>${PAGE_SIZE} 条/页</span>`;
+  pager.innerHTML = html;
+}
+function goPage(p){ page = p; render(); }
+
+/* ================= 按钮行为 ================= */
+function doQuery(){ applyFilter(); }
+function doReset(){
+  document.getElementById('fPhone').value='';
+  document.getElementById('fChannel').value='';
+  document.getElementById('fStatus').value='';
+  document.getElementById('fKw').value='';
+  document.getElementById('fStart').value='';
+  document.getElementById('fEnd').value='';
+  document.querySelectorAll('#quick span').forEach(s=>s.classList.remove('on'));
+  applyFilter();
+}
+function doExport(){
+  if(filtered.length===0){ alert('当前无数据可导出'); return; }
+  const head = ['短信ID','手机号','短信内容','渠道','发送时间','状态','失败原因','服务商回执','流水号','短信类型','关联业务'];
+  const map = {ok:'发送成功',fail:'发送失败',sending:'发送中'};
+  const rows = filtered.map(r=>[r.id,r.phone,r.content,r.ch,r.time,map[r.status],r.reason||'',r.receipt,r.serial,r.type,r.biz]);
+  const csv = [head, ...rows].map(line=>line.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '短信记录_'+fmt(TODAY)+'.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ================= 快捷时间 ================= */
+document.getElementById('quick').addEventListener('click', e=>{
+  const span = e.target.closest('span'); if(!span) return;
+  document.querySelectorAll('#quick span').forEach(s=>s.classList.remove('on'));
+  span.classList.add('on');
+  const q = span.dataset.q;
+  let start, end = new Date(TODAY);
+  if(q==='today'){ start = new Date(TODAY); }
+  else if(q==='week'){ const d = new Date(TODAY); const wd = (d.getDay()+6)%7; start = new Date(d); start.setDate(d.getDate()-wd); }
+  else if(q==='month'){ start = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1); end = new Date(TODAY.getFullYear(), TODAY.getMonth()+1, 0); }
+  else if(q==='year'){ start = new Date(TODAY.getFullYear(),0,1); end = new Date(TODAY.getFullYear(),11,31); }
+  document.getElementById('fStart').value = fmt(start);
+  document.getElementById('fEnd').value = fmt(end);
+  applyFilter();
+});
+
+/* ================= 自定义日历选择器 ================= */
+const WD = ['一','二','三','四','五','六','日'];
+function buildCalendar(calEl, inputEl, viewDate){
+  const y = viewDate.getFullYear(), m = viewDate.getMonth();
+  const first = new Date(y, m, 1);
+  const startWd = (first.getDay()+6)%7;     // 周一为第一列
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const prevDays = new Date(y, m, 0).getDate();
+  const selected = inputEl.value;
+
+  let cells = '';
+  // 上月补位
+  for(let i=startWd-1;i>=0;i--){ cells += `<div class="day other">${prevDays-i}</div>`; }
+  // 本月
+  for(let d=1;d<=daysInMonth;d++){
+    const ds = y+'-'+pad(m+1)+'-'+pad(d);
+    let cls = 'day';
+    if(ds===fmt(TODAY)) cls += ' today';
+    if(ds===selected) cls += ' selected';
+    cells += `<div class="${cls}" data-d="${ds}">${d}</div>`;
+  }
+  // 下月补位
+  const total = startWd + daysInMonth;
+  const tail = (7 - total%7)%7;
+  for(let d=1;d<=tail;d++){ cells += `<div class="day other">${d}</div>`; }
+
+  calEl.innerHTML = `
+    <div class="cal-head">
+      <span class="nav" data-nav="-1">‹</span>
+      <span class="ym">${y}年 ${pad(m+1)}月</span>
+      <span class="nav" data-nav="1">›</span>
+    </div>
+    <div class="cal-grid">${WD.map(w=>`<div class="wd">${w}</div>`).join('')}${cells}</div>
+    <div class="cal-foot"><span data-act="today">今天</span><span data-act="clear">清空</span></div>`;
+
+  // 月份切换
+  calEl.querySelectorAll('.nav').forEach(n=>n.onclick = ev=>{
+    ev.stopPropagation();
+    const nd = new Date(y, m + parseInt(n.dataset.nav), 1);
+    calEl._view = nd;
+    buildCalendar(calEl, inputEl, nd);
+  });
+  // 选择某天
+  calEl.querySelectorAll('.day[data-d]').forEach(d=>d.onclick = ev=>{
+    ev.stopPropagation();
+    inputEl.value = d.dataset.d;
+    closeAllCal();
+    document.querySelectorAll('#quick span').forEach(s=>s.classList.remove('on'));
+    applyFilter();
+  });
+  // 底部
+  calEl.querySelector('[data-act="today"]').onclick = ev=>{
+    ev.stopPropagation(); inputEl.value = fmt(TODAY); closeAllCal();
+    document.querySelectorAll('#quick span').forEach(s=>s.classList.remove('on')); applyFilter();
+  };
+  calEl.querySelector('[data-act="clear"]').onclick = ev=>{
+    ev.stopPropagation(); inputEl.value=''; closeAllCal(); applyFilter();
+  };
+}
+function closeAllCal(){ document.querySelectorAll('.cal').forEach(c=>c.classList.remove('show')); }
+function openCal(inputId, calId){
+  const inputEl = document.getElementById(inputId);
+  const calEl = document.getElementById(calId);
+  const wasOpen = calEl.classList.contains('show');
+  closeAllCal();
+  if(wasOpen) return;
+  const base = inputEl.value ? new Date(inputEl.value.replace(/-/g,'/')) : new Date(TODAY);
+  calEl._view = base;
+  buildCalendar(calEl, inputEl, base);
+  calEl.classList.add('show');
+}
+document.getElementById('fStart').addEventListener('click', e=>{ e.stopPropagation(); openCal('fStart','calStart'); });
+document.getElementById('fEnd').addEventListener('click', e=>{ e.stopPropagation(); openCal('fEnd','calEnd'); });
+document.addEventListener('click', closeAllCal);
+
+/* ================= 详情抽屉 ================= */
+function openDrawer(i){
+  const r = ALL[i];
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="drow"><span class="k">短信ID</span><span class="v">${r.id}</span></div>
+    <div class="drow"><span class="k">手机号</span><span class="v">${r.phone}（完整）</span></div>
+    <div class="drow"><span class="k">渠道</span><span class="v">${chTag(r.ch)}</span></div>
+    <div class="drow"><span class="k">短信类型</span><span class="v">${r.type}</span></div>
+    <div class="drow"><span class="k">短信内容</span><span class="v content-full">${r.content}</span></div>
+    <div class="drow"><span class="k">发送时间</span><span class="v">${r.time}</span></div>
+    <div class="drow"><span class="k">状态</span><span class="v">${statusTag(r.status)}</span></div>
+    <div class="drow"><span class="k">服务商回执</span><span class="v">${r.receipt}</span></div>
+    <div class="drow"><span class="k">服务商流水号</span><span class="v">${r.serial}</span></div>
+    <div class="drow"><span class="k">失败原因</span><span class="v">${r.reason || '—'}</span></div>
+    <div class="drow" style="border-bottom:none;"><span class="k">关联业务</span><span class="v">${r.biz}</span></div>`;
+  document.getElementById('mask').classList.add('show');
+  document.getElementById('drawer').classList.add('show');
+}
+function closeDrawer(){
+  document.getElementById('mask').classList.remove('show');
+  document.getElementById('drawer').classList.remove('show');
+}
+
+/* 初始化 */
+render();
+</script>
+</body>
+</html>
