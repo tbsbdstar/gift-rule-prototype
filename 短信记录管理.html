@@ -56,14 +56,9 @@
   .btn-success { background:#67c23a; color:#fff;} .btn-success:hover{ background:#85ce61;}
 
   /* ===== 统计概览 ===== */
-  .stats { display:flex; gap:34px; margin:16px 0; padding:14px 20px; background:#fafcff; border:1px solid #ebeef5; border-radius:4px;}
-  .stats .item { display:flex; flex-direction:column; gap:4px;}
-  .stats .item .num { font-size:20px; font-weight:600; }
-  .stats .item .lbl { color:#909399; font-size:12px;}
-  .num.ok{color:#67c23a;} .num.fail{color:#f56c6c;} .num.rate{color:#409eff;} .num.sending{color:#909399;}
 
   /* ===== 表格 ===== */
-  table { width:100%; border-collapse:collapse; font-size:13px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; margin-top:18px; }
   thead th { background:#f5f7fa; color:#606266; font-weight:600; text-align:left; padding:11px 12px; border-bottom:1px solid #ebeef5; white-space:nowrap; }
   tbody td { padding:11px 12px; border-bottom:1px solid #ebeef5; color:#606266; vertical-align:middle;}
   tbody tr:hover { background:#f5f7fa; }
@@ -168,7 +163,6 @@
           <div class="field"><label>状态</label>
             <select id="fStatus"><option value="">全部</option><option value="ok">发送成功</option><option value="fail">发送失败</option><option value="sending">发送中</option></select>
           </div>
-          <div class="field"><label>内容关键词</label><input id="fKw" class="kw" placeholder="如：验证码 / 订单" /></div>
 
           <div class="field"><label>发送时间</label>
             <input id="fStart" class="date-input" readonly placeholder="开始日期" />
@@ -185,16 +179,6 @@
           </div>
           <button class="btn btn-primary" onclick="doQuery()">🔍 查询</button>
           <button class="btn btn-default" onclick="doReset()">重置</button>
-          <button class="btn btn-success" onclick="doExport()">⭳ 导出 Excel</button>
-        </div>
-
-        <!-- 统计概览 -->
-        <div class="stats">
-          <div class="item"><span class="num" id="sTotal">0</span><span class="lbl">发送总量</span></div>
-          <div class="item"><span class="num ok" id="sOk">0</span><span class="lbl">发送成功</span></div>
-          <div class="item"><span class="num fail" id="sFail">0</span><span class="lbl">发送失败</span></div>
-          <div class="item"><span class="num sending" id="sSend">0</span><span class="lbl">发送中</span></div>
-          <div class="item"><span class="num rate" id="sRate">0%</span><span class="lbl">成功率</span></div>
         </div>
 
         <!-- 表格 -->
@@ -219,7 +203,6 @@
 <div class="drawer" id="drawer">
   <div class="drawer-head">短信详情 <span class="x" onclick="closeDrawer()">×</span></div>
   <div class="drawer-body" id="drawerBody"></div>
-  <div class="drawer-foot"><button class="btn btn-default" onclick="closeDrawer()">关闭</button></div>
 </div>
 
 <script>
@@ -283,14 +266,12 @@ function applyFilter(){
   const phone = document.getElementById('fPhone').value.trim();
   const ch = document.getElementById('fChannel').value;
   const st = document.getElementById('fStatus').value;
-  const kw = document.getElementById('fKw').value.trim();
   const start = document.getElementById('fStart').value;
   const end = document.getElementById('fEnd').value;
   filtered = ALL.filter(r=>{
     if(phone && !r.phone.includes(phone)) return false;
     if(ch && r.ch !== ch) return false;
     if(st && r.status !== st) return false;
-    if(kw && !r.content.includes(kw)) return false;
     const day = r.time.slice(0,10);
     if(start && day < start) return false;
     if(end && day > end) return false;
@@ -301,16 +282,7 @@ function applyFilter(){
 }
 
 function render(){
-  // 统计
   const total = filtered.length;
-  const ok = filtered.filter(r=>r.status==='ok').length;
-  const fail = filtered.filter(r=>r.status==='fail').length;
-  const send = filtered.filter(r=>r.status==='sending').length;
-  document.getElementById('sTotal').textContent = total;
-  document.getElementById('sOk').textContent = ok;
-  document.getElementById('sFail').textContent = fail;
-  document.getElementById('sSend').textContent = send;
-  document.getElementById('sRate').textContent = total ? ((ok/total*100).toFixed(1)+'%') : '0%';
 
   // 分页数据
   const pages = Math.max(1, Math.ceil(total/PAGE_SIZE));
@@ -353,26 +325,11 @@ function doReset(){
   document.getElementById('fPhone').value='';
   document.getElementById('fChannel').value='';
   document.getElementById('fStatus').value='';
-  document.getElementById('fKw').value='';
   document.getElementById('fStart').value='';
   document.getElementById('fEnd').value='';
   document.querySelectorAll('#quick span').forEach(s=>s.classList.remove('on'));
   applyFilter();
 }
-function doExport(){
-  if(filtered.length===0){ alert('当前无数据可导出'); return; }
-  const head = ['短信ID','手机号','短信内容','渠道','发送时间','状态','失败原因','服务商回执','流水号','短信类型','关联业务'];
-  const map = {ok:'发送成功',fail:'发送失败',sending:'发送中'};
-  const rows = filtered.map(r=>[r.id,r.phone,r.content,r.ch,r.time,map[r.status],r.reason||'',r.receipt,r.serial,r.type,r.biz]);
-  const csv = [head, ...rows].map(line=>line.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
-  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = '短信记录_'+fmt(TODAY)+'.csv';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
 /* ================= 快捷时间 ================= */
 document.getElementById('quick').addEventListener('click', e=>{
   const span = e.target.closest('span'); if(!span) return;
