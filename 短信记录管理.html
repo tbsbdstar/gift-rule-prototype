@@ -67,7 +67,12 @@
   thead th { background:#f5f7fa; color:#606266; font-weight:600; text-align:left; padding:11px 12px; border-bottom:1px solid #ebeef5; white-space:nowrap; }
   tbody td { padding:11px 12px; border-bottom:1px solid #ebeef5; color:#606266; vertical-align:middle;}
   tbody tr:hover { background:#f5f7fa; }
-  .content-cell { max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .content-cell { width:320px; max-width:320px; }
+  .content-scroll { white-space:nowrap; overflow-x:auto; overflow-y:hidden; cursor:text; padding-bottom:2px; }
+  .content-scroll::-webkit-scrollbar { height:6px; }
+  .content-scroll::-webkit-scrollbar-thumb { background:#dcdfe6; border-radius:3px; }
+  .content-scroll::-webkit-scrollbar-thumb:hover { background:#c0c4cc; }
+  .content-scroll::-webkit-scrollbar-track { background:transparent; }
   .empty { text-align:center; color:#909399; padding:40px 0; }
 
   .tag { display:inline-block; padding:1px 8px; border-radius:3px; font-size:12px; line-height:20px; white-space:nowrap; }
@@ -78,7 +83,14 @@
   .tag-gray  { background:#f4f4f5; color:#909399; border:1px solid #e9e9eb;}
 
   .link { color:#409eff; cursor:pointer; } .link:hover { text-decoration:underline; }
-  .eye { color:#909399; cursor:pointer; margin-left:4px; font-size:12px;}
+  .phone-text { display:inline-block; min-width:96px; font-variant-numeric:tabular-nums; }
+  .eye { cursor:pointer; margin-left:6px; color:#909399; display:inline-flex; vertical-align:middle; }
+  .eye:hover { color:#409eff; }
+  .eye svg { width:15px; height:15px; }
+
+  /* 轻提示 toast */
+  #_toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-12px); background:rgba(48,49,51,.92); color:#fff; padding:9px 18px; border-radius:4px; font-size:13px; z-index:200; opacity:0; pointer-events:none; transition:all .25s; }
+  #_toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
   .pager { display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-top:16px; color:#606266; font-size:13px;}
   .pager .pg { min-width:28px; height:28px; line-height:28px; text-align:center; border:1px solid #dcdfe6; border-radius:4px; cursor:pointer; padding:0 6px;}
@@ -234,6 +246,28 @@ const ALL = [
 function pad(n){ return String(n).padStart(2,'0'); }
 function fmt(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
 function mask(p){ return p.slice(0,3)+'****'+p.slice(7); }
+// 眼睛图标（睁开 / 带斜杠）
+const EYE_ON  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M6.06 6.06 1 1m16.94 16.94L23 23"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+function togglePhone(eye){
+  const span = eye.previousElementSibling;
+  if(span.dataset.shown==='1'){
+    span.textContent = mask(span.dataset.full);
+    span.dataset.shown='0'; eye.innerHTML=EYE_OFF; eye.title='点击查看完整号码';
+  } else {
+    span.textContent = span.dataset.full;
+    span.dataset.shown='1'; eye.innerHTML=EYE_ON; eye.title='点击隐藏号码';
+    toast('已查看完整号码，操作已记录');   // 脱敏审计留痕
+  }
+}
+let _toastTimer;
+function toast(msg){
+  let t = document.getElementById('_toast');
+  if(!t){ t = document.createElement('div'); t.id='_toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.className = 'show';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>{ t.className=''; }, 1800);
+}
 function statusTag(s){
   if(s==='ok') return '<span class="tag tag-green">● 发送成功</span>';
   if(s==='fail') return '<span class="tag tag-red">● 发送失败</span>';
@@ -291,8 +325,8 @@ function render(){
       const idx = ALL.indexOf(r);
       return `<tr>
         <td style="color:#909399;font-size:12px;">${r.id}</td>
-        <td>${mask(r.phone)}<span class="eye" title="查看完整号码(将记录操作日志)">👁</span></td>
-        <td class="content-cell" title="${r.content}">${r.content}</td>
+        <td><span class="phone-text" data-full="${r.phone}" data-shown="0">${mask(r.phone)}</span><span class="eye" onclick="togglePhone(this)" title="点击查看完整号码">${EYE_OFF}</span></td>
+        <td class="content-cell"><div class="content-scroll">${r.content}</div></td>
         <td>${chTag(r.ch)}</td>
         <td>${r.time}</td>
         <td>${statusTag(r.status)}</td>
