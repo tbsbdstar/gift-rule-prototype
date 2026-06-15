@@ -7,6 +7,7 @@ Copy-Item $src "$site\index.html" -Force
 git -C $site add -A
 $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 git -C $site commit -m "update $ts" 2>$null
+git -C $site pull --rebase origin main   # 先合并远端(含网页改动)，避免 push 被拒
 git -C $site push
 Write-Host "已推送。约 1 分钟后线上链接自动更新。" -ForegroundColor Green
 

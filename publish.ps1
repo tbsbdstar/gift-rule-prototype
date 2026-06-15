@@ -71,6 +71,7 @@ git -C $repo config core.quotepath false 2>$null
 git -C $repo add -A
 $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 git -C $repo commit -m ("publish " + $ts) 2>$null
+git -C $repo pull --rebase origin main   # 先合并远端(含网页改动)，避免 push 被拒
 git -C $repo push
 
 Write-Host ""
