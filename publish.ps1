@@ -7,6 +7,7 @@
 #   - Drag loose .html file(s)             -> .bat asks a project subfolder (Enter = root)
 #   - Double-click with nothing            -> sync everything (and refresh gift-rule root)
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8   # 正确解码 git 输出的中文路径
 $repo = "C:\Users\taobs\gift-rule-site"
 $base = "https://tbsbdstar.github.io/gift-rule-prototype/"
 $giftSrc = "D:\claude workspace1\赠品规则\玛鲁丸_赠品规则系统_v1.5.html"
@@ -45,25 +46,26 @@ foreach ($f in $Files) {
   }
 }
 
-# auto-bump cache-buster ?v=N in each published project's *_README.md
-$bumped = @{}
-foreach ($rel in $published) {
-  if ($rel -notmatch "/") { continue }            # only files placed inside a project folder
-  $proj = ($rel -split "/")[0]
-  if ($bumped.ContainsKey($proj)) { continue }
-  $bumped[$proj] = $true
-  Get-ChildItem (Join-Path $repo $proj) -Filter *_README.md -ErrorAction SilentlyContinue | ForEach-Object {
-    $txt = [IO.File]::ReadAllText($_.FullName)
-    $ms = [regex]::Matches($txt, '\?v=(\d+)')
-    if ($ms.Count -eq 0) { return }
-    $cur = ($ms | ForEach-Object { [int]$_.Groups[1].Value } | Measure-Object -Maximum).Maximum
-    $nv = $cur + 1
-    $txt = [regex]::Replace($txt, '\?v=\d+', "?v=$nv")
-    $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
-    $txt = $txt.TrimEnd() + "`n- v$nv  ($stamp)`n"   # append a version-log entry at EOF
-    [IO.File]::WriteAllText($_.FullName, $txt, (New-Object System.Text.UTF8Encoding($false)))
-    Write-Host ("[readme] " + $_.Name + " -> v=" + $nv)
-  }
+# auto-bump ?v=N + append version log when a project's page content actually changed.
+# Detection is filesystem-only (page content hash stored in the README) to avoid the
+# Chinese-path encoding pitfalls of parsing git output on Windows PowerShell 5.1.
+Get-ChildItem $repo -Recurse -Filter *_README.md -ErrorAction SilentlyContinue | ForEach-Object {
+  $rf = $_.FullName
+  $pages = Get-ChildItem $_.Directory.FullName -Filter *.html -ErrorAction SilentlyContinue
+  if (-not $pages) { return }
+  $hash = (($pages | Sort-Object Name | ForEach-Object { (Get-FileHash $_.FullName -Algorithm MD5).Hash }) -join "-")
+  $txt = [IO.File]::ReadAllText($rf)
+  $stored = if ($txt -match '<!--\s*pagehash:([0-9A-Fa-f-]+)\s*-->') { $Matches[1] } else { "" }
+  if ($stored -eq $hash) { return }            # page unchanged -> no bump
+  $ms = [regex]::Matches($txt, '\?v=(\d+)')
+  if ($ms.Count -eq 0) { return }
+  $nv = ($ms | ForEach-Object { [int]$_.Groups[1].Value } | Measure-Object -Maximum).Maximum + 1
+  $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
+  $txt = [regex]::Replace($txt, '\?v=\d+', "?v=$nv")
+  $txt = [regex]::Replace($txt, '\s*<!--\s*pagehash:[0-9A-Fa-f-]+\s*-->\s*$', '')   # drop old marker
+  $txt = $txt.TrimEnd() + "`n- v$nv  ($stamp)`n`n<!-- pagehash:$hash -->`n"
+  [IO.File]::WriteAllText($rf, $txt, (New-Object System.Text.UTF8Encoding($false)))
+  Write-Host ("[readme] " + $_.Name + " -> v=" + $nv)
 }
 
 # regenerate catalog.html grouped by top-level folder
