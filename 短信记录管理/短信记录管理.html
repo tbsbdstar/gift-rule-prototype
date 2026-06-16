@@ -205,7 +205,7 @@
 
 <script>
 /* ================= 当前日期锚点（与示例数据匹配） ================= */
-const TODAY = new Date(2026, 5, 15); // 2026-06-15
+const TODAY = (function(){ const d = new Date(); d.setHours(0,0,0,0); return d; })(); // 实际当前日期
 
 /* ================= 示例数据（生成 35 条，真实模板、日期分散） ================= */
 const ALL = (function(){
@@ -329,7 +329,7 @@ function render(){
   html += `<span class="pg ${page<=1?'disabled':''}" onclick="${page>1?'goPage('+(page-1)+')':''}">‹</span>`;
   for(let i=1;i<=pages;i++){ html += `<span class="pg ${i===page?'on':''}" onclick="goPage(${i})">${i}</span>`; }
   html += `<span class="pg ${page>=pages?'disabled':''}" onclick="${page<pages?'goPage('+(page+1)+')':''}">›</span>`;
-  html += `<span>${PAGE_SIZE} 条/页</span>`;
+  html += `<span style="color:#909399;">第 ${page}/${pages} 页 · 本页 ${slice.length} 条</span>`;
   pager.innerHTML = html;
 }
 function goPage(p){ page = p; render(); }
@@ -353,7 +353,7 @@ document.getElementById('quick').addEventListener('click', e=>{
   const q = span.dataset.q;
   let start, end = new Date(TODAY);
   if(q==='today'){ start = new Date(TODAY); }
-  else if(q==='week'){ const d = new Date(TODAY); const wd = (d.getDay()+6)%7; start = new Date(d); start.setDate(d.getDate()-wd); }
+  else if(q==='week'){ const d = new Date(TODAY); const wd = (d.getDay()+6)%7; start = new Date(d); start.setDate(d.getDate()-wd); end = new Date(start); end.setDate(start.getDate()+6); }
   else if(q==='month'){ start = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1); end = new Date(TODAY.getFullYear(), TODAY.getMonth()+1, 0); }
   else if(q==='year'){ start = new Date(TODAY.getFullYear(),0,1); end = new Date(TODAY.getFullYear(),11,31); }
   document.getElementById('fStart').value = fmt(start);
