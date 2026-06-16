@@ -45,6 +45,25 @@ foreach ($f in $Files) {
   }
 }
 
+# auto-bump cache-buster ?v=N in each published project's *_README.md
+$bumped = @{}
+foreach ($rel in $published) {
+  if ($rel -notmatch "/") { continue }            # only files placed inside a project folder
+  $proj = ($rel -split "/")[0]
+  if ($bumped.ContainsKey($proj)) { continue }
+  $bumped[$proj] = $true
+  Get-ChildItem (Join-Path $repo $proj) -Filter *_README.md -ErrorAction SilentlyContinue | ForEach-Object {
+    $txt = [IO.File]::ReadAllText($_.FullName)
+    $ms = [regex]::Matches($txt, '\?v=(\d+)')
+    if ($ms.Count -eq 0) { return }
+    $cur = ($ms | ForEach-Object { [int]$_.Groups[1].Value } | Measure-Object -Maximum).Maximum
+    $nv = $cur + 1
+    $txt = [regex]::Replace($txt, '\?v=\d+', "?v=$nv")
+    [IO.File]::WriteAllText($_.FullName, $txt, (New-Object System.Text.UTF8Encoding($false)))
+    Write-Host ("[readme] " + $_.Name + " -> v=" + $nv)
+  }
+}
+
 # regenerate catalog.html grouped by top-level folder
 $all = Get-ChildItem $repo -Recurse -Filter *.html | Where-Object { $_.FullName -notmatch "\\\.git\\" -and $_.Name -ne "catalog.html" }
 $groups = @{}

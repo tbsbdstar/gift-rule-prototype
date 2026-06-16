@@ -38,15 +38,15 @@ https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%B
 **🖼 Axure 内联框架（Inline Frame）地址**（在 Axure 中拖入「内联框架」元件，把下面地址填入即可内嵌本页）：
 
 ```
-https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=1
+https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=3
 ```
 
-> ⚠️ 末尾的 `?v=1` 是**防缓存版本号**。GitHub 页面会被浏览器/Axure 缓存约 10 分钟，更新后可能看不到最新内容。**每次更新本页面后，把 `v=` 的数字 +1**（改成 `?v=2`、`?v=3`……），Axure 就会强制加载最新版。**当前版本：v=1**
+> ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本页时会**自动把这个数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
 
-通用 `iframe` 嵌入代码（用于其他网页 / 文档内嵌，同样每次更新 +1）：
+通用 `iframe` 嵌入代码（用于其他网页 / 文档内嵌）：
 
 ```html
-<iframe src="https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=1"
+<iframe src="https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=3"
         width="100%" height="800" frameborder="0"></iframe>
 ```
 
