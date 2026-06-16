@@ -59,6 +59,8 @@ foreach ($rel in $published) {
     $cur = ($ms | ForEach-Object { [int]$_.Groups[1].Value } | Measure-Object -Maximum).Maximum
     $nv = $cur + 1
     $txt = [regex]::Replace($txt, '\?v=\d+', "?v=$nv")
+    $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
+    $txt = $txt.TrimEnd() + "`n- v$nv  ($stamp)`n"   # append a version-log entry at EOF
     [IO.File]::WriteAllText($_.FullName, $txt, (New-Object System.Text.UTF8Encoding($false)))
     Write-Host ("[readme] " + $_.Name + " -> v=" + $nv)
   }

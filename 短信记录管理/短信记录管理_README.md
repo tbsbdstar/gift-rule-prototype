@@ -38,7 +38,7 @@ https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%B
 **🖼 Axure 内联框架（Inline Frame）地址**（在 Axure 中拖入「内联框架」元件，把下面地址填入即可内嵌本页）：
 
 ```
-https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=3
+https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=4
 ```
 
 > ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本页时会**自动把这个数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
@@ -46,7 +46,7 @@ https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%B
 通用 `iframe` 嵌入代码（用于其他网页 / 文档内嵌）：
 
 ```html
-<iframe src="https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=3"
+<iframe src="https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=4"
         width="100%" height="800" frameborder="0"></iframe>
 ```
 
@@ -59,3 +59,14 @@ https://tbsbdstar.github.io/gift-rule-prototype/catalog.html
 ---
 
 *仓库：[tbsbdstar/gift-rule-prototype](https://github.com/tbsbdstar/gift-rule-prototype) ｜ 提交者：tbsbdstar*
+
+---
+
+## 📌 版本记录
+
+> 每次发布工具会自动在下方追加一条（`v版本号 (时间)`）；如需补充改动说明，可在对应行后面续写。
+
+- v1  (2026-06-15) · 初版发布
+- v2  (2026-06-16) · 移入 `短信记录管理/` 项目文件夹，补防缓存版本号 `?v=`
+- v3  (2026-06-16 11:15) · 内容更新发布
+- v4  (2026-06-16 11:23)
