@@ -99,7 +99,7 @@
   .drawer-head .x { cursor:pointer; color:#909399; font-size:20px; }
   .drawer-body { padding:8px 20px; overflow:auto; flex:1;}
   .drow { display:flex; padding:13px 0; border-bottom:1px dashed #ebeef5; }
-  .drow .k { width:96px; color:#909399; flex-shrink:0;}
+  .drow .k { width:120px; color:#909399; flex-shrink:0;}
   .drow .v { color:#303133; word-break:break-all; flex:1;}
   .drow .v.content-full { background:#f8f9fb; padding:10px; border-radius:4px; line-height:1.6; }
   .drawer-foot { padding:14px 20px; border-top:1px solid #ebeef5; display:flex; justify-content:flex-end; gap:10px;}
@@ -159,7 +159,7 @@
           <div class="field"><label>渠道</label>
             <select id="fChannel"><option value="">全部</option><option>玛鲁丸</option><option>会员购</option></select>
           </div>
-          <div class="field"><label>状态</label>
+          <div class="field"><label>调用三方接口状态</label>
             <select id="fStatus"><option value="">全部</option><option value="ok">发送成功</option><option value="fail">发送失败</option></select>
           </div>
 
@@ -185,7 +185,7 @@
           <thead>
             <tr>
               <th>短信ID</th><th>手机号</th><th>短信内容</th><th>订单号</th><th>渠道</th>
-              <th>发送时间 ↓</th><th>状态</th><th>失败原因</th><th style="text-align:center;">操作</th>
+              <th>发送时间 ↓</th><th>调用三方接口状态</th><th>失败原因</th><th style="text-align:center;">操作</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -452,7 +452,7 @@ function openDrawer(i){
     <div class="drow"><span class="k">订单号</span><span class="v">${r.order || '—'}</span></div>
     <div class="drow"><span class="k">短信内容</span><span class="v content-full">${r.content}</span></div>
     <div class="drow"><span class="k">发送时间</span><span class="v">${r.time}</span></div>
-    <div class="drow"><span class="k">状态</span><span class="v">${statusTag(r.status)}</span></div>
+    <div class="drow"><span class="k">调用三方接口状态</span><span class="v">${statusTag(r.status)}</span></div>
     <div class="drow"><span class="k">服务商回执</span><span class="v">${r.receipt}</span></div>
     <div class="drow"><span class="k">服务商流水号</span><span class="v">${r.serial}</span></div>
     <div class="drow" style="border-bottom:none;"><span class="k">失败原因</span><span class="v">${r.reason || '—'}</span></div>`;
