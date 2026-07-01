@@ -157,7 +157,7 @@
           <div class="field"><label>手机号</label><input id="fPhone" class="phone" placeholder="请输入手机号" /></div>
           <div class="field"><label>订单号</label><input id="fOrder" class="phone" placeholder="请输入订单号" /></div>
           <div class="field"><label>渠道</label>
-            <select id="fChannel"><option value="">全部</option><option>玛鲁丸</option><option>会员购</option></select>
+            <select id="fChannel"><option value="">全部</option><option>玛鲁丸</option><option>会员购</option><option>乐意门</option></select>
           </div>
           <div class="field"><label>调用三方接口状态</label>
             <select id="fStatus"><option value="">全部</option><option value="ok">发送成功</option><option value="fail">发送失败</option></select>
@@ -242,7 +242,7 @@ const ALL = (function(){
       phone: pre[i%pre.length] + String(10000000+(i*1234567)%90000000),
       content: '【杭州玛鲁丸】'+body,
       order: tplIdx===0 ? '' : so,      // 验证码类短信无关联订单
-      ch: (i%2===0)?'玛鲁丸':'会员购',
+      ch: ['玛鲁丸','会员购','乐意门'][i%3],
       time: fmt(d)+' '+pad(hh)+':'+pad(mm)+':'+pad(ss),
       status, reason, receipt,
       serial: '90'+ymd+hms+pad(i+1)
@@ -273,7 +273,7 @@ function statusTag(s){
   if(s==='fail') return '<span class="tag tag-red">● 发送失败</span>';
   return '<span class="tag tag-gray">● 发送中</span>';
 }
-function chTag(c){ return '<span class="tag '+(c==='玛鲁丸'?'tag-purple':'tag-orange')+'">'+c+'</span>'; }
+function chTag(c){ const cls = c==='玛鲁丸'?'tag-purple':(c==='会员购'?'tag-orange':'tag-blue'); return '<span class="tag '+cls+'">'+c+'</span>'; }
 
 /* ================= 过滤 + 渲染 ================= */
 let filtered = ALL.slice();
