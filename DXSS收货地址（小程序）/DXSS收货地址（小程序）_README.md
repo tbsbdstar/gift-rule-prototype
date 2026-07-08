@@ -20,9 +20,10 @@
 | 👁 地址预览 | 实时预览完整地址 |
 | 💾 保存 | 「保存并使用」保存地址 |
 
-**本项目含 2 个页面：**
-- `收货地址页（中日）.html` — 中国大陆 / 日本 双区域版
-- `收货地址页（日）.html` — 日本地址专用版
+**本项目含 3 个页面：**
+- `收货地址页（中日）.html` — 新增地址表单，中国大陆 / 日本 双区域版
+- `收货地址页（日）.html` — 新增地址表单，日本地址专用版
+- `日本地址管理.html` — 日本地址**列表/管理页**：展示已存地址（受取人 / 電話番号 / 郵便番号 / 住所），支持设为默认、编辑、删除，底部「＋新增日本收货地址」入口
 
 > 说明：本页为**前端交互原型**，内置示例/地址数据，用于演示界面与交互流程。
 
@@ -42,6 +43,10 @@
   ```
   https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html
   ```
+- 日本地址管理：
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%97%A5%E6%9C%AC%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html
+  ```
 
 ### 🖼 Axure 内联框架（Inline Frame）地址
 
@@ -52,6 +57,10 @@
 - 收货地址页（日）：
   ```
   https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=2
+  ```
+- 日本地址管理：
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%97%A5%E6%9C%AC%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=2
   ```
 
 > ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本项目时会**自动把数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
