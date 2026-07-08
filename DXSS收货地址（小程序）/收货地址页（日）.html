@@ -136,7 +136,7 @@ body{font-family:'Noto Sans SC','Hiragino Sans','Yu Gothic',sans-serif;backgroun
 
 <div class="phone"><div class="screen">
   <div class="statusbar"><span>9:41</span><span class="r">●●● 📶 🔋</span></div>
-  <div class="navbar"><span class="back" onclick="location.href='日本地址管理.html'">‹</span><span class="title">新增日本收货地址</span></div>
+  <div class="navbar"><span class="back" onclick="location.href='（日）地址管理.html'">‹</span><span class="title">新增日本收货地址</span></div>
 
   <div class="scroll">
 
@@ -665,7 +665,7 @@ function onSave(){
   if(editId){ var i=-1; list.forEach(function(x,k){if(x.id===editId)i=k;}); if(i>=0) list[i]=rec; else list.push(rec); }
   else list.push(rec);
   localStorage.setItem('addr_jp_only', JSON.stringify(list));
-  location.href='日本地址管理.html';
+  location.href='（日）地址管理.html';
 }
 
 switchRegion('jp');   // 本页面固定日本表单
