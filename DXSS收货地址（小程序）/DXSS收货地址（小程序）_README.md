@@ -1,0 +1,77 @@
+# DXSS 收货地址（小程序）— 原型说明
+
+> 丸噗噜（MARUONE）小程序「新增收货地址」交互原型，支持中国大陆 / 日本双区域，含日本邮编自动带出地区
+
+---
+
+## 一、整体功能说明
+
+小程序端的**新增收货地址**表单，用于用户填写并保存收货地址，重点支持**日本地址**的录入体验。
+
+**核心功能：**
+
+| 模块 | 说明 |
+|------|------|
+| 👤 收件人信息 | 填写收件人姓名、手机号 |
+| 🌏 所在地区 | 切换国家/地区（中国大陆 / 日本），不同地区表单适配 |
+| 〒 邮编自动带出 | 日本地址输入 7 位邮便番号，自动带出对应都道府县/市区町村等地区信息 |
+| 🏠 详细地址 | 详细地址 + 楼名·房号 |
+| 🔍 地区搜索 | 支持搜索选择所在地区 |
+| 👁 地址预览 | 实时预览完整地址 |
+| 💾 保存 | 「保存并使用」保存地址 |
+
+**本项目含 2 个页面：**
+- `收货地址页（中日）.html` — 中国大陆 / 日本 双区域版
+- `收货地址页（日）.html` — 日本地址专用版
+
+> 说明：本页为**前端交互原型**，内置示例/地址数据，用于演示界面与交互流程。
+
+---
+
+## 二、在线访问与部署（永久链接）
+
+已部署到 GitHub Pages，链接长期有效，更新后约 1 分钟自动生效。
+
+### 🔗 直接分享链接（浏览器打开）
+
+- 收货地址页（中日）：
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html
+  ```
+- 收货地址页（日）：
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html
+  ```
+
+### 🖼 Axure 内联框架（Inline Frame）地址
+
+- 收货地址页（中日）：
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html?v=1
+  ```
+- 收货地址页（日）：
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=1
+  ```
+
+> ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本项目时会**自动把数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
+
+### 📚 原型总目录（所有页面集合）
+
+```
+https://tbsbdstar.github.io/gift-rule-prototype/catalog.html
+```
+
+---
+
+*仓库：[tbsbdstar/gift-rule-prototype](https://github.com/tbsbdstar/gift-rule-prototype) ｜ 提交者：tbsbdstar*
+
+---
+
+## 📌 版本记录
+
+> 每次发布工具会自动在下方追加一条（`v版本号 (时间)`）；如需补充改动说明，可在对应行后面续写。
+
+- v1  (2026-07-08) · 初版发布（中日版 + 日本版两个页面）
+
+<!-- pagehash:5BFCEBA0A04F929D6ADA5B0CA86E6511-742A6591EB02F272E9A09023531ED22B -->
