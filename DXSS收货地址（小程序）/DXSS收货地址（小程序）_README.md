@@ -47,11 +47,11 @@
 
 - 收货地址页（中日）：
   ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html?v=1
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html?v=2
   ```
 - 收货地址页（日）：
   ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=1
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=2
   ```
 
 > ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本项目时会**自动把数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
@@ -73,5 +73,6 @@ https://tbsbdstar.github.io/gift-rule-prototype/catalog.html
 > 每次发布工具会自动在下方追加一条（`v版本号 (时间)`）；如需补充改动说明，可在对应行后面续写。
 
 - v1  (2026-07-08) · 初版发布（中日版 + 日本版两个页面）
+- v2  (2026-07-08 12:20)
 
-<!-- pagehash:5BFCEBA0A04F929D6ADA5B0CA86E6511-742A6591EB02F272E9A09023531ED22B -->
+<!-- pagehash:822E62D74036DED4E96182A6C9840B74-5BFCEBA0A04F929D6ADA5B0CA86E6511-742A6591EB02F272E9A09023531ED22B -->
