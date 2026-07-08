@@ -1,0 +1,134 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>收货地址管理 · 丸噗噜小程序</title>
+<style>
+:root{--bg:#E9EBF0;--card:#fff;--line:#EEEFF3;--t1:#1A1A26;--t2:#8A8A9A;--t3:#B4B4C2;--red:#F5483B;--jp:#D7373F;--green:#2AC97E;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans SC','Hiragino Sans','Yu Gothic',sans-serif;background:var(--bg);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:24px}
+.phone{width:390px;background:#000;border-radius:46px;padding:12px;box-shadow:0 30px 80px rgba(30,30,60,.28)}
+.screen{background:var(--bg);border-radius:36px;overflow:hidden;height:822px;display:flex;flex-direction:column;position:relative}
+.statusbar{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:14px;font-weight:600;color:var(--t1);flex-shrink:0}
+.statusbar .r{display:flex;gap:6px;font-size:12px}
+.navbar{height:48px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.navbar .back{position:absolute;left:18px;font-size:26px;color:var(--t1);cursor:pointer;line-height:1}
+.navbar .title{font-size:17px;font-weight:600;color:var(--t1)}
+.scroll{flex:1;overflow-y:auto;padding:8px 14px 96px}
+.scroll::-webkit-scrollbar{width:0}
+
+.group-h{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--t2);margin:14px 4px 8px}
+.group-h .flag{font-size:15px}
+.group-h.cn{color:var(--red)} .group-h.jp{color:var(--jp)}
+.group-h{cursor:pointer;user-select:none}
+.group-h .line{flex:1;height:1px;background:var(--line)}
+.group-h .cnt{font-size:12px;font-weight:600;color:#fff;background:var(--t3);border-radius:9px;padding:0 7px;line-height:17px;min-width:17px;text-align:center}
+.group-h.cn .cnt{background:var(--red)} .group-h.jp .cnt{background:var(--jp)}
+.group-h .chev{margin-left:2px;color:var(--t3);font-size:15px;transition:transform .22s;display:inline-block}
+.group-h .chev.open{transform:rotate(180deg)}
+.group-body{overflow:hidden}
+
+.card{background:var(--card);border-radius:14px;margin-bottom:12px;padding:16px;border-left:3px solid transparent}
+.card.cn{border-left-color:var(--red)} .card.jp{border-left-color:var(--jp)}
+.badge{display:inline-block;color:#fff;font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px;margin-left:8px;vertical-align:middle}
+.badge.cn{background:var(--red)} .badge.jp{background:var(--jp)}
+.frow{display:flex;font-size:14px;line-height:1.7;margin-bottom:2px}
+.frow .k{width:72px;flex-shrink:0;color:var(--t3);font-size:13px}
+.frow .v{flex:1;color:var(--t1);word-break:break-all}
+.frow.name .v{font-size:16px;font-weight:600}
+.hr{height:1px;background:var(--line);margin:12px 0 10px}
+.ops{display:flex;align-items:center;gap:18px}
+.op{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--t2);cursor:pointer}
+.op.set .dot{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--t3);display:inline-block}
+.op.set.on{color:var(--green)}
+.op.set.on .dot{border-color:var(--green);background:radial-gradient(circle,#fff 3px,var(--green) 4px)}
+.op.grow{margin-left:auto}
+.op.del{color:#C0392B}
+.empty{text-align:center;color:var(--t3);font-size:14px;padding:70px 0}
+.empty .ic{font-size:44px;margin-bottom:10px}
+.footer{position:absolute;bottom:0;left:0;right:0;padding:12px 16px 20px;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+.add-btn{width:100%;height:48px;border:none;border-radius:24px;background:linear-gradient(135deg,var(--red),#c62b20);color:#fff;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(245,72,59,.3)}
+.add-btn:active{opacity:.85}
+</style>
+
+<div class="phone"><div class="screen">
+  <div class="statusbar"><span>9:41</span><span class="r">●●● 📶 🔋</span></div>
+  <div class="navbar"><span class="back" onclick="history.back()">‹</span><span class="title">收货地址管理</span></div>
+  <div class="scroll" id="list"></div>
+  <div class="footer"><button class="add-btn" onclick="location.href='收货地址页.html'">＋ 新增收货地址</button></div>
+</div></div>
+
+<script>
+var KEY='addr_multi', SEED_VER='2';   // 升级样例：改版本号即自动重置一次
+function seedData(){ return [
+  // 中国大陆
+  {id:1,country:'cn',name:'张伟',tel:'13800001111',pref:'广东省',city:'深圳市',town:'南山区',detail:'科技园路1号A栋2001室',def:true},
+  {id:2,country:'cn',name:'李娜',tel:'13900002222',pref:'浙江省',city:'杭州市',town:'西湖区',detail:'文三路478号华星时代广场B座1503',def:false},
+  {id:3,country:'cn',name:'王强',tel:'13700003333',pref:'江苏省',city:'苏州市',town:'姑苏区',detail:'干将东路666号',def:false},
+  {id:4,country:'cn',name:'刘洋',tel:'13600004444',pref:'四川省',city:'成都市',town:'武侯区',detail:'天府大道北段1700号',def:false},
+  {id:5,country:'cn',name:'陈静',tel:'13500005555',pref:'湖北省',city:'武汉市',town:'江汉区',detail:'解放大道688号',def:false},
+  {id:6,country:'cn',name:'赵磊',tel:'13400006666',pref:'广东省',city:'广州市',town:'天河区',detail:'珠江新城华夏路10号',def:false},
+  // 日本
+  {id:7,country:'jp',name:'山田 太郎',telCC:'081',tel:'09012345678',zip:'100-0001',pref:'東京都',city:'千代田区',town:'千代田',detail:'1-1',bldg:'皇居前ビル5F',def:true},
+  {id:8,country:'jp',name:'鈴木 一郎',telCC:'081',tel:'08023456789',zip:'085-0467',pref:'北海道',city:'釧路市',town:'阿寒町阿寒湖温泉（１〜６丁目）',detail:'3-5',bldg:'',def:false},
+  {id:9,country:'jp',name:'田中 花子',telCC:'086',tel:'13611112222',zip:'530-0001',pref:'大阪府',city:'大阪市北区',town:'梅田',detail:'2-4-6',bldg:'梅田スカイ30F',def:false},
+  {id:10,country:'jp',name:'佐藤 美咲',telCC:'081',tel:'08099998888',zip:'150-0002',pref:'東京都',city:'渋谷区',town:'渋谷',detail:'2-3-4',bldg:'渋谷タワー20F',def:false},
+  {id:11,country:'jp',name:'高橋 実',telCC:'081',tel:'07034567890',zip:'220-0001',pref:'神奈川県',city:'横浜市西区',town:'北軽井沢',detail:'2-19',bldg:'ヨコハマビル5F',def:false},
+  {id:12,country:'jp',name:'渡辺 由美',telCC:'086',tel:'13522223333',zip:'812-0885',pref:'福岡県',city:'福岡市博多区',town:'相生町',detail:'5-1',bldg:'',def:false}
+]; }
+function load(){
+  var s=localStorage.getItem(KEY);
+  if(!s || localStorage.getItem(KEY+'_ver')!==SEED_VER){   // 首次或样例升级 → 注入样例
+    var seed=seedData();
+    localStorage.setItem(KEY,JSON.stringify(seed));
+    localStorage.setItem(KEY+'_ver',SEED_VER);
+    return seed;
+  }
+  try{ return JSON.parse(s)||[]; }catch(e){ return []; }
+}
+function save(a){ localStorage.setItem(KEY,JSON.stringify(a)); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function addrLine(a){
+  if(a.country==='cn') return esc((a.pref||'')+(a.city||'')+(a.town||'')+' '+(a.detail||''));
+  return esc((a.pref||'')+(a.city||'')+(a.town||'')+(a.detail||'')+(a.bldg?(' '+a.bldg):''));
+}
+function cardHtml(a){
+  var cc=a.country;
+  var zipRow = cc==='jp' ? '<div class="frow"><span class="k">郵便番号</span><span class="v">'+(a.zip?'〒'+esc(a.zip):'—')+'</span></div>' : '';
+  var telLabel = cc==='jp' ? '電話番号' : '手机号';
+  var addrLabel = cc==='jp' ? '住所' : '地址';
+  var nameLabel = cc==='jp' ? '受取人' : '收货人';
+  return '<div class="card '+cc+'">'
+    +'<div class="frow name"><span class="k">'+nameLabel+'</span><span class="v">'+esc(a.name)+(a.def?'<span class="badge '+cc+'">默认</span>':'')+'</span></div>'
+    +'<div class="frow"><span class="k">'+telLabel+'</span><span class="v">'+esc(a.telCC?(a.telCC+' '):'')+esc(a.tel)+'</span></div>'
+    +zipRow
+    +'<div class="frow"><span class="k">'+addrLabel+'</span><span class="v">'+addrLine(a)+'</span></div>'
+    +'<div class="hr"></div>'
+    +'<div class="ops">'
+      +'<span class="op set'+(a.def?' on':'')+'" onclick="setDefault('+a.id+')"><span class="dot"></span>'+(a.def?'默认地址':'设为默认')+'</span>'
+      +'<span class="op grow" onclick="edit('+a.id+')">✎ 编辑</span>'
+      +'<span class="op del" onclick="del('+a.id+')">🗑 删除</span>'
+    +'</div></div>';
+}
+var collapsed={cn:false,jp:false};   // 分组折叠状态
+function groupBlock(cls,flag,title,arr){
+  if(!arr.length) return '';
+  var open=!collapsed[cls];
+  return '<div class="group-h '+cls+'" onclick="toggleGroup(\''+cls+'\')">'
+      +'<span class="flag">'+flag+'</span>'+title+'<span class="cnt">'+arr.length+'</span>'
+      +'<span class="line"></span><span class="chev'+(open?' open':'')+'">⌄</span></div>'
+    +'<div class="group-body"'+(open?'':' style="display:none"')+'>'+arr.map(cardHtml).join('')+'</div>';
+}
+function render(){
+  var list=load(), box=document.getElementById('list');
+  if(!list.length){ box.innerHTML='<div class="empty"><div class="ic">📭</div>还没有收货地址<br>点击下方按钮新增</div>'; return; }
+  var cn=list.filter(function(a){return a.country!=='jp';});
+  var jp=list.filter(function(a){return a.country==='jp';});
+  box.innerHTML=groupBlock('cn','🇨🇳','中国大陆',cn)+groupBlock('jp','🇯🇵','日本',jp);
+}
+function toggleGroup(c){ collapsed[c]=!collapsed[c]; render(); }
+// 按国家各保留一个默认地址（中国、日本互不影响）
+function setDefault(id){ var l=load(),t=null; l.forEach(function(x){if(x.id===id)t=x;}); if(!t)return;
+  l.forEach(function(x){ if(x.country===t.country) x.def=(x.id===id); }); save(l); render(); }
+function del(id){ if(!confirm('确定删除该地址？')) return; save(load().filter(function(x){return x.id!==id;})); render(); }
+function edit(id){ location.href='收货地址页.html?edit='+id; }
+render();
+</script>
