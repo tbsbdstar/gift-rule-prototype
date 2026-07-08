@@ -43,7 +43,7 @@ body{font-family:'Noto Sans SC','Hiragino Sans','Yu Gothic',sans-serif;backgroun
   <div class="statusbar"><span>9:41</span><span class="r">●●● 📶 🔋</span></div>
   <div class="navbar"><span class="back" onclick="history.back()">‹</span><span class="title">地址管理</span></div>
   <div class="scroll" id="list"></div>
-  <div class="footer"><button class="add-btn" onclick="location.href='新增日本收货地址.html'">＋ 新增日本收货地址</button></div>
+  <div class="footer"><button class="add-btn" onclick="location.href='收货地址页（日）.html'">＋ 新增日本收货地址</button></div>
 </div></div>
 
 <script>
@@ -91,6 +91,6 @@ function render(){
 }
 function setDefault(id){ var l=load(); l.forEach(function(x){x.def=(x.id===id);}); save(l); render(); }
 function del(id){ if(!confirm('确定删除该地址？')) return; save(load().filter(function(x){return x.id!==id;})); render(); }
-function edit(id){ location.href='新增日本收货地址.html?edit='+id; }
+function edit(id){ location.href='收货地址页（日）.html?edit='+id; }
 render();
 </script>

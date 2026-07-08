@@ -57,19 +57,19 @@
 
 - 收货地址页（中日）：
   ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html?v=3
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html?v=4
   ```
 - 收货地址页（日）：
   ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=3
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=4
   ```
 - （中日）地址管理：
   ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=3
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=4
   ```
 - （日）地址管理：
   ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=3
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=4
   ```
 
 > ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本项目时会**自动把数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
@@ -93,5 +93,6 @@ https://tbsbdstar.github.io/gift-rule-prototype/catalog.html
 - v1  (2026-07-08) · 初版发布（中日版 + 日本版两个页面）
 - v2  (2026-07-08 12:20)
 - v3  (2026-07-08 12:27)
+- v4  (2026-07-08 12:31)
 
-<!-- pagehash:822E62D74036DED4E96182A6C9840B74-C3D78F4E89D4D5E864A55BAA2B48BA56-5BFCEBA0A04F929D6ADA5B0CA86E6511-742A6591EB02F272E9A09023531ED22B -->
+<!-- pagehash:469A7143AD1A4AD56C503600C193EEA2-703304E50BE06DCE5CFD4AAE2037D069-5BFCEBA0A04F929D6ADA5B0CA86E6511-742A6591EB02F272E9A09023531ED22B -->
