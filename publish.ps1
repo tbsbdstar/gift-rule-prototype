@@ -2,10 +2,24 @@
   [string]$Project = "",
   [Parameter(ValueFromRemainingArguments=$true)][string[]]$Files
 )
-# Publish to GitHub Pages, organized by project subfolder.
-#   - Drag a PROJECT FOLDER onto the .bat  -> published as /<folder>/...
-#   - Drag loose .html file(s)             -> .bat asks a project subfolder (Enter = root)
-#   - Double-click with nothing            -> sync everything (and refresh gift-rule root)
+# ============================================================================
+# 发布HTML到在线 —— 把原型 HTML 发布到 GitHub Pages（tbsbdstar/gift-rule-prototype）
+# 完整设计与背景见同目录 工具说明.md（换电脑/新会话读它即可上手）。
+#
+# 用法（对应 发布HTML到在线.bat）：
+#   - 拖一个项目文件夹到 .bat        -> 发布为 /<文件夹名>/...
+#   - 拖单个/多个 .html 到 .bat      -> .bat 会问项目子目录名（回车=根目录）
+#   - 直接双击（不拖任何东西）        -> 同步全部改动 + 刷新赠品规则首页
+#
+# 本脚本每次运行会自动：
+#   1) 刷新首页 index.html（= 赠品规则源文件）
+#   2) 对每个"项目文件夹"（含 .html 的顶层子目录）：
+#        · 没有 *_README.md -> 用 _readme_template.md 自动生成一份（含链接、?v=1、版本记录、哈希标记）
+#        · 有 *_README.md   -> 只在页面内容变化时，自动把 ?v= 数字 +1 并追加一条版本记录
+#      （内容是否变化 = 对文件夹内所有 .html 算 MD5，与 README 里 <!-- pagehash:... --> 比对）
+#   3) 重新生成 catalog.html 目录页
+#   4) git add/commit/pull --rebase/push（提交者固定 tbsbdstar）
+# ----------------------------------------------------------------------------
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8   # 正确解码 git 输出的中文路径
 $repo = "C:\Users\taobs\gift-rule-site"
@@ -46,14 +60,47 @@ foreach ($f in $Files) {
   }
 }
 
-# auto-bump ?v=N + append version log when a project's page content actually changed.
-# Detection is filesystem-only (page content hash stored in the README) to avoid the
-# Chinese-path encoding pitfalls of parsing git output on Windows PowerShell 5.1.
-Get-ChildItem $repo -Recurse -Filter *_README.md -ErrorAction SilentlyContinue | ForEach-Object {
-  $rf = $_.FullName
-  $pages = Get-ChildItem $_.Directory.FullName -Filter *.html -ErrorAction SilentlyContinue
+# For every project folder (top-level subdir containing .html):
+#   - NO *_README.md   -> auto-generate one from _readme_template.md (starts at v1)
+#   - HAS *_README.md  -> bump ?v= + append a version-log line, ONLY when page content changed
+# All change-detection is filesystem-only: an MD5 of the folder's pages is stored in the
+# README as <!-- pagehash:... -->. This avoids parsing git output, which mangles Chinese
+# paths on Windows PowerShell 5.1. (See 工具说明.md for the full design.)
+$tpl = Join-Path $repo "_readme_template.md"
+$fence = '```'
+Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | ForEach-Object {
+  $dir = $_.FullName; $proj = $_.Name
+  $pages = Get-ChildItem $dir -Filter *.html -ErrorAction SilentlyContinue | Sort-Object Name
   if (-not $pages) { return }
-  $hash = (($pages | Sort-Object Name | ForEach-Object { (Get-FileHash $_.FullName -Algorithm MD5).Hash }) -join "-")
+  $hash = (($pages | ForEach-Object { (Get-FileHash $_.FullName -Algorithm MD5).Hash }) -join "-")
+  $readme = Get-ChildItem $dir -Filter *_README.md -ErrorAction SilentlyContinue | Select-Object -First 1
+
+  if (-not $readme) {
+    # ---- first publish of this project: auto-generate a README skeleton ----
+    if (-not (Test-Path $tpl)) { Write-Host ("[readme] no template, skip " + $proj); return }
+    $pagesList = ($pages | ForEach-Object {
+      $t = ""
+      $head = (Get-Content $_.FullName -TotalCount 40 -Encoding UTF8 -ErrorAction SilentlyContinue) -join "`n"
+      if ($head -match '<title>\s*(.*?)\s*</title>') { $t = " - " + $Matches[1] }
+      "- " + $_.Name + $t
+    }) -join "`n"
+    $direct = ($pages | ForEach-Object { "- " + $_.Name + "`n  " + $fence + "`n  " + ($base + (Enc ($proj + "/" + $_.Name))) + "`n  " + $fence }) -join "`n"
+    $axure  = ($pages | ForEach-Object { "- " + $_.Name + "`n  " + $fence + "`n  " + ($base + (Enc ($proj + "/" + $_.Name)) + "?v=1") + "`n  " + $fence }) -join "`n"
+    $md = [IO.File]::ReadAllText($tpl)
+    $md = $md.Replace('{{PROJECT}}', $proj)
+    $md = $md.Replace('{{PAGE_COUNT}}', [string]$pages.Count)
+    $md = $md.Replace('{{PAGES_LIST}}', $pagesList)
+    $md = $md.Replace('{{DIRECT_LINKS}}', $direct)
+    $md = $md.Replace('{{AXURE_LINKS}}', $axure)
+    $md = $md.Replace('{{DATE}}', (Get-Date -Format 'yyyy-MM-dd'))
+    $md = $md.Replace('{{PAGEHASH}}', $hash)
+    [IO.File]::WriteAllText((Join-Path $dir ($proj + "_README.md")), $md, (New-Object System.Text.UTF8Encoding($false)))
+    Write-Host ("[readme] created " + $proj + "_README.md (v1, auto)")
+    return
+  }
+
+  # ---- existing README: bump ?v= + version log only when page content changed ----
+  $rf = $readme.FullName
   $txt = [IO.File]::ReadAllText($rf)
   $stored = if ($txt -match '<!--\s*pagehash:([0-9A-Fa-f-]+)\s*-->') { $Matches[1] } else { "" }
   if ($stored -eq $hash) { return }            # page unchanged -> no bump
@@ -65,7 +112,7 @@ Get-ChildItem $repo -Recurse -Filter *_README.md -ErrorAction SilentlyContinue |
   $txt = [regex]::Replace($txt, '\s*<!--\s*pagehash:[0-9A-Fa-f-]+\s*-->\s*$', '')   # drop old marker
   $txt = $txt.TrimEnd() + "`n- v$nv  ($stamp)`n`n<!-- pagehash:$hash -->`n"
   [IO.File]::WriteAllText($rf, $txt, (New-Object System.Text.UTF8Encoding($false)))
-  Write-Host ("[readme] " + $_.Name + " -> v=" + $nv)
+  Write-Host ("[readme] " + $readme.Name + " -> v=" + $nv)
 }
 
 # regenerate catalog.html grouped by top-level folder
