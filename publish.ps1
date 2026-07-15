@@ -22,7 +22,7 @@
 # ----------------------------------------------------------------------------
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8   # 正确解码 git 输出的中文路径
-$repo = "C:\Users\taobs\gift-rule-site"
+$repo = $PSScriptRoot   # 自动识别=脚本所在文件夹（仓库根）；仓库整体移动/换电脑也无需改路径
 $base = "https://tbsbdstar.github.io/gift-rule-prototype/"
 $giftSrc = "D:\claude workspace1\赠品规则\玛鲁丸_赠品规则系统_v1.5.html"
 
