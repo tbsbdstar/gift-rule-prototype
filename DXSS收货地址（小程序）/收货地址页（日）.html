@@ -132,11 +132,40 @@ body{font-family:'Noto Sans SC','Hiragino Sans','Yu Gothic',sans-serif;backgroun
 .opt.skip{color:var(--t2);font-size:13px}
 .opt.loading{color:var(--t3);cursor:default;justify-content:center}
 .opt .ck{color:var(--jp);font-weight:700}
+
+/* ===== 列表视图(地址管理) ===== */
+#view-list,#view-form{flex:1;min-height:0;display:flex;flex-direction:column}
+#view-list{display:none}
+.lm-card{background:var(--card);border-radius:14px;margin-bottom:12px;padding:16px}
+.lm-frow{display:flex;font-size:14px;line-height:1.7;margin-bottom:2px}
+.lm-frow .lm-k{width:72px;flex-shrink:0;color:var(--t3);font-size:13px}
+.lm-frow .lm-v{flex:1;color:var(--t1);word-break:break-all}
+.lm-frow.lm-name .lm-v{font-size:16px;font-weight:600}
+.lm-badge{display:inline-block;background:var(--jp);color:#fff;font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px;margin-left:8px;vertical-align:middle}
+.lm-hr{height:1px;background:var(--line);margin:12px 0 10px}
+.lm-ops{display:flex;align-items:center;gap:18px}
+.lm-op{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--t2);cursor:pointer}
+.lm-op.lm-set .lm-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--t3);display:inline-block}
+.lm-op.lm-set.on{color:var(--jp)}
+.lm-op.lm-set.on .lm-dot{border-color:var(--jp);background:radial-gradient(circle,#fff 3px,var(--jp) 4px)}
+.lm-op.grow{margin-left:auto}
+.lm-op.lm-del{color:#C0392B}
+.lm-empty{text-align:center;color:var(--t3);font-size:14px;padding:80px 0}
+.lm-empty .ic{font-size:44px;margin-bottom:10px}
+.lm-add{width:100%;height:48px;border:none;border-radius:24px;background:linear-gradient(135deg,var(--jp),#b3282f);color:#fff;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(215,55,63,.32)}
 </style>
 
 <div class="phone"><div class="screen">
   <div class="statusbar"><span>9:41</span><span class="r">●●● 📶 🔋</span></div>
-  <div class="navbar"><span class="back" onclick="location.href='（日）地址管理.html'">‹</span><span class="title">新增日本收货地址</span></div>
+  <!-- ===== 列表视图：地址管理 ===== -->
+  <div id="view-list">
+    <div class="navbar"><span class="title">地址管理</span></div>
+    <div class="scroll" id="lm-list"></div>
+    <div class="footer"><button class="lm-add" onclick="newAddr()">＋ 新增日本收货地址</button></div>
+  </div>
+  <!-- ===== 新增/编辑视图 ===== -->
+  <div id="view-form">
+  <div class="navbar"><span class="back" onclick="showList()">‹</span><span class="title" id="form-title">新增日本收货地址</span></div>
 
   <div class="scroll">
 
@@ -217,6 +246,7 @@ body{font-family:'Noto Sans SC','Hiragino Sans','Yu Gothic',sans-serif;backgroun
     <div class="cc-opt" onclick="pickCC('081','日本')">日本　081</div>
     <div class="cc-opt" onclick="pickCC('086','中国')">中国　086</div>
   </div>
+  </div><!--/view-form-->
 </div></div>
 
 <!-- 全国完整地址+邮编数据(同目录)。缺失时页面自动回退在线方案 -->
@@ -656,7 +686,7 @@ function onSave(){
     if(!detail){ alert('请填写详细地址'); return; }
   }
   // 保存到本地地址簿，返回地址管理页
-  var rec={ id: editId||Date.now(), country:'jp', name:name, telCC:telCC, tel:tel,
+  var rec={ id: editId||Date.now(), ts:Date.now(), country:'jp', name:name, telCC:telCC, tel:tel,
     zip:document.getElementById('zip').value.trim(), pref:sel[0]||'', city:sel[1]||'', town:sel[2]||'',
     detail:detail, bldg:document.getElementById('bldg').value.trim(),
     def:document.getElementById('sw-default').classList.contains('on') };
@@ -665,7 +695,7 @@ function onSave(){
   if(editId){ var i=-1; list.forEach(function(x,k){if(x.id===editId)i=k;}); if(i>=0) list[i]=rec; else list.push(rec); }
   else list.push(rec);
   localStorage.setItem('addr_jp_only', JSON.stringify(list));
-  location.href='（日）地址管理.html';
+  afterSave();
 }
 
 switchRegion('jp');   // 本页面固定日本表单
@@ -687,5 +717,63 @@ var editId=null;
   picked.jp=[a.pref||'', a.city||'', a.town||''];
   if(a.def) document.getElementById('sw-default').classList.add('on');
   syncRegionValue(); renderPreview();
+})();
+</script>
+<script>
+(function(){
+  var VKEY='addr_jp_only', SV='3';
+  function loadAll(){ try{return JSON.parse(localStorage.getItem(VKEY)||'[]');}catch(e){return[];} }
+  function saveAll(a){ localStorage.setItem(VKEY,JSON.stringify(a)); }
+  function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function line(a){return esc((a.pref||'')+(a.city||'')+(a.town||'')+(a.detail||'')+(a.bldg?(' '+a.bldg):''));}
+  // 排序：默认置顶，其余按创建时间(id) 由近及远
+  function sorted(){ return loadAll().slice().sort(function(x,y){ return (y.def?1:0)-(x.def?1:0) || ((y.ts||y.id)-(x.ts||x.id)); }); }
+  window.renderList=function(){
+    var box=document.getElementById('lm-list'); var l=sorted();
+    if(!l.length){ box.innerHTML='<div class="lm-empty"><div class="ic">📭</div>还没有收货地址<br>点击下方按钮新增</div>'; return; }
+    box.innerHTML=l.map(function(a){
+      return '<div class="lm-card">'
+        +'<div class="lm-frow lm-name"><span class="lm-k">受取人</span><span class="lm-v">'+esc(a.name)+(a.def?'<span class="lm-badge">默认</span>':'')+'</span></div>'
+        +'<div class="lm-frow"><span class="lm-k">電話番号</span><span class="lm-v">'+esc((a.telCC?a.telCC+' ':'')+a.tel)+'</span></div>'
+        +'<div class="lm-frow"><span class="lm-k">郵便番号</span><span class="lm-v">'+(a.zip?'〒'+esc(a.zip):'—')+'</span></div>'
+        +'<div class="lm-frow"><span class="lm-k">住所</span><span class="lm-v">'+line(a)+'</span></div>'
+        +'<div class="lm-hr"></div>'
+        +'<div class="lm-ops">'
+          +'<span class="lm-op lm-set'+(a.def?' on':'')+'" onclick="lmSetDefault('+a.id+')"><span class="lm-dot"></span>'+(a.def?'默认地址':'设为默认')+'</span>'
+          +'<span class="lm-op grow" onclick="lmEdit('+a.id+')">✎ 编辑</span>'
+          +'<span class="lm-op lm-del" onclick="lmDel('+a.id+')">🗑 删除</span>'
+        +'</div></div>';
+    }).join('');
+  };
+  window.lmSetDefault=function(id){ var l=loadAll(); l.forEach(function(x){x.def=(x.id===id);}); saveAll(l); renderList(); };
+  window.lmDel=function(id){ if(!confirm('确定删除该地址？'))return; saveAll(loadAll().filter(function(x){return x.id!==id;})); renderList(); };
+  window.showList=function(){ document.getElementById('view-form').style.display='none'; document.getElementById('view-list').style.display='flex'; renderList(); };
+  window.showForm=function(){ document.getElementById('view-list').style.display='none'; document.getElementById('view-form').style.display='flex'; };
+  window.afterSave=function(){ showList(); var b=document.getElementById('lm-list'); if(b)b.scrollTop=0; };
+  function resetForm(){
+    ['name','tel','zip','detail','bldg'].forEach(function(k){var e=document.getElementById(k); if(e)e.value='';});
+    picked.jp=[]; telCC='081'; var t=document.getElementById('tel-cc-txt'); if(t)t.textContent='081';
+    var sw=document.getElementById('sw-default'); if(sw)sw.classList.remove('on');
+    if(typeof syncRegionValue==='function') syncRegionValue();
+    if(typeof renderPreview==='function') renderPreview();
+  }
+  function prefillForm(id){
+    var a=loadAll().filter(function(x){return x.id===id;})[0]; if(!a)return;
+    editId=id;
+    var ft=document.getElementById('form-title'); if(ft)ft.textContent='编辑日本收货地址';
+    document.getElementById('name').value=a.name||''; document.getElementById('tel').value=a.tel||'';
+    if(a.telCC){ telCC=a.telCC; var t=document.getElementById('tel-cc-txt'); if(t)t.textContent=a.telCC; }
+    document.getElementById('zip').value=a.zip||''; document.getElementById('detail').value=a.detail||''; document.getElementById('bldg').value=a.bldg||'';
+    picked.jp=[a.pref||'',a.city||'',a.town||''];
+    var sw=document.getElementById('sw-default'); if(sw){ a.def?sw.classList.add('on'):sw.classList.remove('on'); }
+    syncRegionValue(); renderPreview();
+  }
+  window.newAddr=function(){ editId=null; resetForm(); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增日本收货地址'; showForm(); };
+  window.lmEdit=function(id){ prefillForm(id); showForm(); };
+  // 样例种子(版本控制，升级自动重置)
+  if(!localStorage.getItem(VKEY) || localStorage.getItem(VKEY+'_ver')!==SV){
+    localStorage.setItem(VKEY, '[{"id":1,"country":"jp","name":"山田 太郎","telCC":"081","tel":"09012345678","zip":"085-0467","pref":"北海道","city":"釧路市","town":"阿寒町阿寒湖温泉（１〜６丁目）","detail":"1-1","bldg":"アカンビル101","def":true},{"id":2,"country":"jp","name":"佐藤 花子","telCC":"081","tel":"08023456789","zip":"150-0002","pref":"東京都","city":"渋谷区","town":"渋谷","detail":"2-3-4","bldg":"渋谷タワー20F","def":false},{"id":3,"country":"jp","name":"鈴木 一郎","telCC":"086","tel":"13800001111","zip":"530-0001","pref":"大阪府","city":"大阪市北区","town":"梅田","detail":"1-2-3","bldg":"","def":false},{"id":4,"country":"jp","name":"高橋 実","telCC":"081","tel":"07034567890","zip":"220-0001","pref":"神奈川県","city":"横浜市西区","town":"北軽井沢","detail":"2-19","bldg":"ヨコハマビル5F","def":false},{"id":5,"country":"jp","name":"田中 美咲","telCC":"081","tel":"08099998888","zip":"100-0001","pref":"東京都","city":"千代田区","town":"千代田","detail":"1-1","bldg":"パレスビル8F","def":false},{"id":6,"country":"jp","name":"伊藤 健","telCC":"086","tel":"13566667777","zip":"064-0821","pref":"北海道","city":"札幌市中央区","town":"北一条西（２０〜２８丁目）","detail":"3","bldg":"札幌センター","def":false},{"id":7,"country":"jp","name":"渡辺 由美","telCC":"081","tel":"07011112222","zip":"812-0885","pref":"福岡県","city":"福岡市博多区","town":"相生町","detail":"5-1","bldg":"","def":false},{"id":8,"country":"jp","name":"中村 大輔","telCC":"081","tel":"09033334444","zip":"460-0008","pref":"愛知県","city":"名古屋市中区","town":"栄","detail":"3-5-1","bldg":"サカエビル12F","def":false}]'); localStorage.setItem(VKEY+'_ver',SV);
+  }
+  showForm(); renderList();
 })();
 </script>

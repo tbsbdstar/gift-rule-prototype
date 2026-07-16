@@ -132,11 +132,51 @@ body{font-family:'Noto Sans SC','Hiragino Sans','Yu Gothic',sans-serif;backgroun
 .opt.skip{color:var(--t2);font-size:13px}
 .opt.loading{color:var(--t3);cursor:default;justify-content:center}
 .opt .ck{color:var(--jp);font-weight:700}
+
+/* ===== 列表视图(中日地址管理) ===== */
+#view-list,#view-form{flex:1;min-height:0;display:flex;flex-direction:column}
+#view-list{display:none}
+#view-list .scroll{padding-top:8px}
+.lm-gh{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--t2);margin:14px 4px 8px;cursor:pointer;user-select:none}
+.lm-gh.cn{color:var(--red)} .lm-gh.jp{color:var(--jp)}
+.lm-gh .lm-flag{font-size:15px}
+.lm-gh .lm-line{flex:1;height:1px;background:var(--line)}
+.lm-gh .lm-cnt{font-size:12px;font-weight:600;color:#fff;background:var(--t3);border-radius:9px;padding:0 7px;line-height:17px;min-width:17px;text-align:center}
+.lm-gh.cn .lm-cnt{background:var(--red)} .lm-gh.jp .lm-cnt{background:var(--jp)}
+.lm-gh .lm-chev{margin-left:2px;color:var(--t3);font-size:15px;transition:transform .22s;display:inline-block}
+.lm-gh .lm-chev.open{transform:rotate(180deg)}
+.lm-card{background:var(--card);border-radius:14px;margin-bottom:12px;padding:16px;border-left:3px solid transparent}
+.lm-card.cn{border-left-color:var(--red)} .lm-card.jp{border-left-color:var(--jp)}
+.lm-frow{display:flex;font-size:14px;line-height:1.7;margin-bottom:2px}
+.lm-frow .lm-k{width:72px;flex-shrink:0;color:var(--t3);font-size:13px}
+.lm-frow .lm-v{flex:1;color:var(--t1);word-break:break-all}
+.lm-frow.lm-name .lm-v{font-size:16px;font-weight:600}
+.lm-badge{display:inline-block;color:#fff;font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px;margin-left:8px;vertical-align:middle}
+.lm-badge.cn{background:var(--red)} .lm-badge.jp{background:var(--jp)}
+.lm-hr{height:1px;background:var(--line);margin:12px 0 10px}
+.lm-ops{display:flex;align-items:center;gap:18px}
+.lm-op{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--t2);cursor:pointer}
+.lm-op.lm-set .lm-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--t3);display:inline-block}
+.lm-op.lm-set.on{color:var(--green)}
+.lm-op.lm-set.on .lm-dot{border-color:var(--green);background:radial-gradient(circle,#fff 3px,var(--green) 4px)}
+.lm-op.grow{margin-left:auto}
+.lm-op.lm-del{color:#C0392B}
+.lm-empty{text-align:center;color:var(--t3);font-size:14px;padding:70px 0}
+.lm-empty .ic{font-size:44px;margin-bottom:10px}
+.lm-add{width:100%;height:48px;border:none;border-radius:24px;background:linear-gradient(135deg,var(--red),#c62b20);color:#fff;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(245,72,59,.3)}
 </style>
 
 <div class="phone"><div class="screen">
   <div class="statusbar"><span>9:41</span><span class="r">●●● 📶 🔋</span></div>
-  <div class="navbar"><span class="back" onclick="location.href='（中日）地址管理.html'">‹</span><span class="title">新增收货地址</span></div>
+  <!-- ===== 列表视图：收货地址管理(中/日) ===== -->
+  <div id="view-list">
+    <div class="navbar"><span class="title">收货地址管理</span></div>
+    <div class="scroll" id="lm-list"></div>
+    <div class="footer"><button class="lm-add" onclick="newAddr()">＋ 新增收货地址</button></div>
+  </div>
+  <!-- ===== 新增/编辑视图 ===== -->
+  <div id="view-form">
+  <div class="navbar"><span class="back" onclick="showList()">‹</span><span class="title" id="form-title">新增收货地址</span></div>
 
   <div class="scroll">
     <div class="region-tabs">
@@ -221,6 +261,7 @@ body{font-family:'Noto Sans SC','Hiragino Sans','Yu Gothic',sans-serif;backgroun
     <div class="cc-opt" onclick="pickCC('081','日本')">日本　081</div>
     <div class="cc-opt" onclick="pickCC('086','中国')">中国　086</div>
   </div>
+  </div><!--/view-form-->
 </div></div>
 
 <!-- 全国完整地址+邮编数据(同目录)。缺失时页面自动回退在线方案 -->
@@ -662,7 +703,7 @@ function onSave(){
     if(!detail){ alert('请填写详细地址'); return; }
   }
   // 保存到本地地址簿(区分中/日)，返回地址管理页
-  var rec={ id: editId||Date.now(), country:region, name:name, tel:tel,
+  var rec={ id: editId||Date.now(), ts:Date.now(), country:region, name:name, tel:tel,
     telCC:(region==='jp'?telCC:''), zip:(region==='jp'?document.getElementById('zip').value.trim():''),
     pref:sel[0]||'', city:sel[1]||'', town:sel[2]||'', detail:detail,
     bldg:(region==='jp'?document.getElementById('bldg').value.trim():''),
@@ -672,7 +713,7 @@ function onSave(){
   if(editId){ var i=-1; list.forEach(function(x,k){if(x.id===editId)i=k;}); if(i>=0) list[i]=rec; else list.push(rec); }
   else list.push(rec);
   localStorage.setItem('addr_multi', JSON.stringify(list));
-  location.href='（中日）地址管理.html';
+  afterSave();
 }
 
 renderPreview();
@@ -697,5 +738,64 @@ var editId=null;
   }
   if(a.def) document.getElementById('sw-default').classList.add('on');
   syncRegionValue(); renderPreview();
+})();
+</script>
+<script>
+(function(){
+  var VKEY='addr_multi', SV='3';
+  function loadAll(){ try{return JSON.parse(localStorage.getItem(VKEY)||'[]');}catch(e){return[];} }
+  function saveAll(a){ localStorage.setItem(VKEY,JSON.stringify(a)); }
+  function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function line(a){ if(a.country==='cn') return esc((a.pref||'')+(a.city||'')+(a.town||'')+' '+(a.detail||''));
+    return esc((a.pref||'')+(a.city||'')+(a.town||'')+(a.detail||'')+(a.bldg?(' '+a.bldg):'')); }
+  function sortG(arr){ return arr.slice().sort(function(x,y){ return (y.def?1:0)-(x.def?1:0) || ((y.ts||y.id)-(x.ts||x.id)); }); }  // 默认置顶+创建倒序
+  function card(a){ var cc=a.country;
+    var nameL=cc==='jp'?'受取人':'收货人', telL=cc==='jp'?'電話番号':'手机号', addrL=cc==='jp'?'住所':'地址';
+    var zipRow=cc==='jp'?'<div class="lm-frow"><span class="lm-k">郵便番号</span><span class="lm-v">'+(a.zip?'〒'+esc(a.zip):'—')+'</span></div>':'';
+    return '<div class="lm-card '+cc+'">'
+      +'<div class="lm-frow lm-name"><span class="lm-k">'+nameL+'</span><span class="lm-v">'+esc(a.name)+(a.def?'<span class="lm-badge '+cc+'">默认</span>':'')+'</span></div>'
+      +'<div class="lm-frow"><span class="lm-k">'+telL+'</span><span class="lm-v">'+esc((a.telCC?a.telCC+' ':'')+a.tel)+'</span></div>'
+      +zipRow
+      +'<div class="lm-frow"><span class="lm-k">'+addrL+'</span><span class="lm-v">'+line(a)+'</span></div>'
+      +'<div class="lm-hr"></div>'
+      +'<div class="lm-ops">'
+        +'<span class="lm-op lm-set'+(a.def?' on':'')+'" onclick="lmSetDefault('+a.id+')"><span class="lm-dot"></span>'+(a.def?'默认地址':'设为默认')+'</span>'
+        +'<span class="lm-op grow" onclick="lmEdit('+a.id+')">✎ 编辑</span>'
+        +'<span class="lm-op lm-del" onclick="lmDel('+a.id+')">🗑 删除</span>'
+      +'</div></div>';
+  }
+  var collapsed={cn:false,jp:false};
+  function grp(cls,flag,title,arr){ if(!arr.length)return''; var open=!collapsed[cls];
+    return '<div class="lm-gh '+cls+'" onclick="lmToggle(\''+cls+'\')"><span class="lm-flag">'+flag+'</span>'+title+'<span class="lm-cnt">'+arr.length+'</span><span class="lm-line"></span><span class="lm-chev'+(open?' open':'')+'">⌄</span></div>'
+      +'<div class="lm-gbody"'+(open?'':' style="display:none"')+'>'+arr.map(card).join('')+'</div>'; }
+  window.lmToggle=function(c){ collapsed[c]=!collapsed[c]; renderList(); };
+  window.renderList=function(){
+    var box=document.getElementById('lm-list'), l=loadAll();
+    if(!l.length){ box.innerHTML='<div class="lm-empty"><div class="ic">📭</div>还没有收货地址<br>点击下方按钮新增</div>'; return; }
+    var cn=sortG(l.filter(function(a){return a.country!=='jp';})), jp=sortG(l.filter(function(a){return a.country==='jp';}));
+    box.innerHTML=grp('cn','🇨🇳','中国大陆',cn)+grp('jp','🇯🇵','日本',jp);
+  };
+  window.lmSetDefault=function(id){ var l=loadAll(),t=null; l.forEach(function(x){if(x.id===id)t=x;}); if(!t)return; l.forEach(function(x){ if(x.country===t.country) x.def=(x.id===id); }); saveAll(l); renderList(); };
+  window.lmDel=function(id){ if(!confirm('确定删除该地址？'))return; saveAll(loadAll().filter(function(x){return x.id!==id;})); renderList(); };
+  window.showList=function(){ document.getElementById('view-form').style.display='none'; document.getElementById('view-list').style.display='flex'; renderList(); };
+  window.showForm=function(){ document.getElementById('view-list').style.display='none'; document.getElementById('view-form').style.display='flex'; };
+  window.afterSave=function(){ showList(); var b=document.getElementById('lm-list'); if(b)b.scrollTop=0; };
+  function clearFields(){ ['name','tel','zip','detail','bldg'].forEach(function(k){var e=document.getElementById(k); if(e)e.value='';});
+    picked.cn=[]; picked.jp=[]; telCC='081'; var t=document.getElementById('tel-cc-txt'); if(t)t.textContent='081';
+    var sw=document.getElementById('sw-default'); if(sw)sw.classList.remove('on'); }
+  window.newAddr=function(){ editId=null; clearFields(); switchRegion('cn'); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增收货地址'; if(typeof syncRegionValue==='function')syncRegionValue(); if(typeof renderPreview==='function')renderPreview(); showForm(); };
+  function prefillForm(id){ var a=loadAll().filter(function(x){return x.id===id;})[0]; if(!a)return; editId=id;
+    clearFields(); switchRegion(a.country==='jp'?'jp':'cn');
+    var ft=document.getElementById('form-title'); if(ft)ft.textContent='编辑收货地址';
+    document.getElementById('name').value=a.name||''; document.getElementById('tel').value=a.tel||''; document.getElementById('detail').value=a.detail||'';
+    picked[region]=[a.pref||'',a.city||'',a.town||''];
+    if(a.country==='jp'){ if(a.telCC){telCC=a.telCC;var t=document.getElementById('tel-cc-txt');if(t)t.textContent=a.telCC;} document.getElementById('zip').value=a.zip||''; document.getElementById('bldg').value=a.bldg||''; }
+    var sw=document.getElementById('sw-default'); if(sw){a.def?sw.classList.add('on'):sw.classList.remove('on');}
+    syncRegionValue(); renderPreview(); }
+  window.lmEdit=function(id){ prefillForm(id); showForm(); };
+  if(!localStorage.getItem(VKEY) || localStorage.getItem(VKEY+'_ver')!==SV){
+    localStorage.setItem(VKEY, '[{"id":1,"country":"cn","name":"张伟","tel":"13800001111","pref":"广东省","city":"深圳市","town":"南山区","detail":"科技园路1号A栋2001室","def":true},{"id":2,"country":"cn","name":"李娜","tel":"13900002222","pref":"浙江省","city":"杭州市","town":"西湖区","detail":"文三路478号华星时代广场B座1503","def":false},{"id":3,"country":"cn","name":"王强","tel":"13700003333","pref":"江苏省","city":"苏州市","town":"姑苏区","detail":"干将东路666号","def":false},{"id":4,"country":"cn","name":"刘洋","tel":"13600004444","pref":"四川省","city":"成都市","town":"武侯区","detail":"天府大道北段1700号","def":false},{"id":5,"country":"cn","name":"陈静","tel":"13500005555","pref":"湖北省","city":"武汉市","town":"江汉区","detail":"解放大道688号","def":false},{"id":6,"country":"cn","name":"赵磊","tel":"13400006666","pref":"广东省","city":"广州市","town":"天河区","detail":"珠江新城华夏路10号","def":false},{"id":7,"country":"jp","name":"山田 太郎","telCC":"081","tel":"09012345678","zip":"100-0001","pref":"東京都","city":"千代田区","town":"千代田","detail":"1-1","bldg":"皇居前ビル5F","def":true},{"id":8,"country":"jp","name":"鈴木 一郎","telCC":"081","tel":"08023456789","zip":"085-0467","pref":"北海道","city":"釧路市","town":"阿寒町阿寒湖温泉（１〜６丁目）","detail":"3-5","bldg":"アカン101","def":false},{"id":9,"country":"jp","name":"田中 花子","telCC":"086","tel":"13611112222","zip":"530-0001","pref":"大阪府","city":"大阪市北区","town":"梅田","detail":"2-4-6","bldg":"梅田スカイ30F","def":false},{"id":10,"country":"jp","name":"佐藤 美咲","telCC":"081","tel":"08099998888","zip":"150-0002","pref":"東京都","city":"渋谷区","town":"渋谷","detail":"2-3-4","bldg":"渋谷タワー20F","def":false},{"id":11,"country":"jp","name":"高橋 実","telCC":"081","tel":"07034567890","zip":"220-0001","pref":"神奈川県","city":"横浜市西区","town":"北軽井沢","detail":"2-19","bldg":"ヨコハマ5F","def":false},{"id":12,"country":"jp","name":"渡辺 由美","telCC":"086","tel":"13522223333","zip":"812-0885","pref":"福岡県","city":"福岡市博多区","town":"相生町","detail":"5-1","bldg":"博多ビル","def":false}]'); localStorage.setItem(VKEY+'_ver',SV);
+  }
+  showForm(); renderList();
 })();
 </script>
