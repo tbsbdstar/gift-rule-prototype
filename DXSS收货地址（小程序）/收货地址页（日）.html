@@ -768,12 +768,12 @@ var editId=null;
     var sw=document.getElementById('sw-default'); if(sw){ a.def?sw.classList.add('on'):sw.classList.remove('on'); }
     syncRegionValue(); renderPreview();
   }
-  window.newAddr=function(){ editId=null; resetForm(); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增日本收货地址'; showForm(); };
+  window.newAddr=function(){ editId=null; resetForm(); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增日本收货地址'; showForm(); var swd=document.getElementById('sw-default'); if(swd)swd.classList.add('on'); };
   window.lmEdit=function(id){ prefillForm(id); showForm(); };
   // 样例种子(版本控制，升级自动重置)
   if(!localStorage.getItem(VKEY) || localStorage.getItem(VKEY+'_ver')!==SV){
     localStorage.setItem(VKEY, '[{"id":1,"country":"jp","name":"山田 太郎","telCC":"081","tel":"09012345678","zip":"085-0467","pref":"北海道","city":"釧路市","town":"阿寒町阿寒湖温泉（１〜６丁目）","detail":"1-1","bldg":"アカンビル101","def":true},{"id":2,"country":"jp","name":"佐藤 花子","telCC":"081","tel":"08023456789","zip":"150-0002","pref":"東京都","city":"渋谷区","town":"渋谷","detail":"2-3-4","bldg":"渋谷タワー20F","def":false},{"id":3,"country":"jp","name":"鈴木 一郎","telCC":"086","tel":"13800001111","zip":"530-0001","pref":"大阪府","city":"大阪市北区","town":"梅田","detail":"1-2-3","bldg":"","def":false},{"id":4,"country":"jp","name":"高橋 実","telCC":"081","tel":"07034567890","zip":"220-0001","pref":"神奈川県","city":"横浜市西区","town":"北軽井沢","detail":"2-19","bldg":"ヨコハマビル5F","def":false},{"id":5,"country":"jp","name":"田中 美咲","telCC":"081","tel":"08099998888","zip":"100-0001","pref":"東京都","city":"千代田区","town":"千代田","detail":"1-1","bldg":"パレスビル8F","def":false},{"id":6,"country":"jp","name":"伊藤 健","telCC":"086","tel":"13566667777","zip":"064-0821","pref":"北海道","city":"札幌市中央区","town":"北一条西（２０〜２８丁目）","detail":"3","bldg":"札幌センター","def":false},{"id":7,"country":"jp","name":"渡辺 由美","telCC":"081","tel":"07011112222","zip":"812-0885","pref":"福岡県","city":"福岡市博多区","town":"相生町","detail":"5-1","bldg":"","def":false},{"id":8,"country":"jp","name":"中村 大輔","telCC":"081","tel":"09033334444","zip":"460-0008","pref":"愛知県","city":"名古屋市中区","town":"栄","detail":"3-5-1","bldg":"サカエビル12F","def":false}]'); localStorage.setItem(VKEY+'_ver',SV);
   }
-  showForm(); renderList();
+  renderList(); newAddr();
 })();
 </script>

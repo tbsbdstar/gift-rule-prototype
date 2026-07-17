@@ -783,7 +783,7 @@ var editId=null;
   function clearFields(){ ['name','tel','zip','detail','bldg'].forEach(function(k){var e=document.getElementById(k); if(e)e.value='';});
     picked.cn=[]; picked.jp=[]; telCC='081'; var t=document.getElementById('tel-cc-txt'); if(t)t.textContent='081';
     var sw=document.getElementById('sw-default'); if(sw)sw.classList.remove('on'); }
-  window.newAddr=function(){ editId=null; clearFields(); switchRegion('cn'); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增收货地址'; if(typeof syncRegionValue==='function')syncRegionValue(); if(typeof renderPreview==='function')renderPreview(); showForm(); };
+  window.newAddr=function(){ editId=null; clearFields(); switchRegion('cn'); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增收货地址'; if(typeof syncRegionValue==='function')syncRegionValue(); if(typeof renderPreview==='function')renderPreview(); showForm(); var swd=document.getElementById('sw-default'); if(swd)swd.classList.add('on'); };
   function prefillForm(id){ var a=loadAll().filter(function(x){return x.id===id;})[0]; if(!a)return; editId=id;
     clearFields(); switchRegion(a.country==='jp'?'jp':'cn');
     var ft=document.getElementById('form-title'); if(ft)ft.textContent='编辑收货地址';
@@ -796,6 +796,6 @@ var editId=null;
   if(!localStorage.getItem(VKEY) || localStorage.getItem(VKEY+'_ver')!==SV){
     localStorage.setItem(VKEY, '[{"id":1,"country":"cn","name":"张伟","tel":"13800001111","pref":"广东省","city":"深圳市","town":"南山区","detail":"科技园路1号A栋2001室","def":true},{"id":2,"country":"cn","name":"李娜","tel":"13900002222","pref":"浙江省","city":"杭州市","town":"西湖区","detail":"文三路478号华星时代广场B座1503","def":false},{"id":3,"country":"cn","name":"王强","tel":"13700003333","pref":"江苏省","city":"苏州市","town":"姑苏区","detail":"干将东路666号","def":false},{"id":4,"country":"cn","name":"刘洋","tel":"13600004444","pref":"四川省","city":"成都市","town":"武侯区","detail":"天府大道北段1700号","def":false},{"id":5,"country":"cn","name":"陈静","tel":"13500005555","pref":"湖北省","city":"武汉市","town":"江汉区","detail":"解放大道688号","def":false},{"id":6,"country":"cn","name":"赵磊","tel":"13400006666","pref":"广东省","city":"广州市","town":"天河区","detail":"珠江新城华夏路10号","def":false},{"id":7,"country":"jp","name":"山田 太郎","telCC":"081","tel":"09012345678","zip":"100-0001","pref":"東京都","city":"千代田区","town":"千代田","detail":"1-1","bldg":"皇居前ビル5F","def":true},{"id":8,"country":"jp","name":"鈴木 一郎","telCC":"081","tel":"08023456789","zip":"085-0467","pref":"北海道","city":"釧路市","town":"阿寒町阿寒湖温泉（１〜６丁目）","detail":"3-5","bldg":"アカン101","def":false},{"id":9,"country":"jp","name":"田中 花子","telCC":"086","tel":"13611112222","zip":"530-0001","pref":"大阪府","city":"大阪市北区","town":"梅田","detail":"2-4-6","bldg":"梅田スカイ30F","def":false},{"id":10,"country":"jp","name":"佐藤 美咲","telCC":"081","tel":"08099998888","zip":"150-0002","pref":"東京都","city":"渋谷区","town":"渋谷","detail":"2-3-4","bldg":"渋谷タワー20F","def":false},{"id":11,"country":"jp","name":"高橋 実","telCC":"081","tel":"07034567890","zip":"220-0001","pref":"神奈川県","city":"横浜市西区","town":"北軽井沢","detail":"2-19","bldg":"ヨコハマ5F","def":false},{"id":12,"country":"jp","name":"渡辺 由美","telCC":"086","tel":"13522223333","zip":"812-0885","pref":"福岡県","city":"福岡市博多区","town":"相生町","detail":"5-1","bldg":"博多ビル","def":false}]'); localStorage.setItem(VKEY+'_ver',SV);
   }
-  showForm(); renderList();
+  renderList(); newAddr();
 })();
 </script>

@@ -768,7 +768,7 @@ var editId=null;
     var sw=document.getElementById('sw-default'); if(sw){ a.def?sw.classList.add('on'):sw.classList.remove('on'); }
     syncRegionValue(); renderPreview();
   }
-  window.newAddr=function(){ editId=null; resetForm(); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增日本收货地址'; showForm(); };
+  window.newAddr=function(){ editId=null; resetForm(); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增日本收货地址'; showForm(); var swd=document.getElementById('sw-default'); if(swd)swd.classList.add('on'); };
   window.lmEdit=function(id){ prefillForm(id); showForm(); };
   // 样例种子(版本控制，升级自动重置)
   if(!localStorage.getItem(VKEY) || localStorage.getItem(VKEY+'_ver')!==SV){

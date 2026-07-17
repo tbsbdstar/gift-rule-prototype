@@ -783,7 +783,7 @@ var editId=null;
   function clearFields(){ ['name','tel','zip','detail','bldg'].forEach(function(k){var e=document.getElementById(k); if(e)e.value='';});
     picked.cn=[]; picked.jp=[]; telCC='081'; var t=document.getElementById('tel-cc-txt'); if(t)t.textContent='081';
     var sw=document.getElementById('sw-default'); if(sw)sw.classList.remove('on'); }
-  window.newAddr=function(){ editId=null; clearFields(); switchRegion('cn'); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增收货地址'; if(typeof syncRegionValue==='function')syncRegionValue(); if(typeof renderPreview==='function')renderPreview(); showForm(); };
+  window.newAddr=function(){ editId=null; clearFields(); switchRegion('cn'); var ft=document.getElementById('form-title'); if(ft)ft.textContent='新增收货地址'; if(typeof syncRegionValue==='function')syncRegionValue(); if(typeof renderPreview==='function')renderPreview(); showForm(); var swd=document.getElementById('sw-default'); if(swd)swd.classList.add('on'); };
   function prefillForm(id){ var a=loadAll().filter(function(x){return x.id===id;})[0]; if(!a)return; editId=id;
     clearFields(); switchRegion(a.country==='jp'?'jp':'cn');
     var ft=document.getElementById('form-title'); if(ft)ft.textContent='编辑收货地址';
