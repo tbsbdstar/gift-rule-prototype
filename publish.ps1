@@ -31,6 +31,21 @@ if (Test-Path $giftSrc) { Copy-Item $giftSrc (Join-Path $repo "index.html") -For
 
 function Enc([string]$rel){ ($rel -split '/' | ForEach-Object { [uri]::EscapeDataString($_) }) -join '/' }
 
+# 用新内容替换 README 里 <!--AUTO-LINKS:TAG--> 与 <!--/AUTO-LINKS:TAG--> 之间的部分（找不到标记则原样返回）
+function Set-Region([string]$text,[string]$tag,[string]$body){
+  $a = "<!--AUTO-LINKS:$tag-->"; $b = "<!--/AUTO-LINKS:$tag-->"
+  $i = $text.IndexOf($a); $j = $text.IndexOf($b)
+  if ($i -lt 0 -or $j -lt 0 -or $j -le $i) { return $text }
+  return $text.Substring(0, $i + $a.Length) + "`n" + $body + "`n" + $text.Substring($j)
+}
+# 根据文件夹内实际页面重建"直接链接/Axure链接"两段（axure 用给定版本号）
+function Build-Links($pages,$proj,$base,$fence,$ver,$withV){
+  ($pages | ForEach-Object {
+    $u = $base + (Enc ($proj + "/" + $_.Name)); if ($withV) { $u = $u + "?v=$ver" }
+    "- " + $_.Name + "`n  " + $fence + "`n  " + $u + "`n  " + $fence
+  }) -join "`n"
+}
+
 $published = @()
 foreach ($f in $Files) {
   if (-not (Test-Path $f)) { continue }
@@ -84,8 +99,8 @@ Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | Fo
       if ($head -match '<title>\s*(.*?)\s*</title>') { $t = " - " + $Matches[1] }
       "- " + $_.Name + $t
     }) -join "`n"
-    $direct = ($pages | ForEach-Object { "- " + $_.Name + "`n  " + $fence + "`n  " + ($base + (Enc ($proj + "/" + $_.Name))) + "`n  " + $fence }) -join "`n"
-    $axure  = ($pages | ForEach-Object { "- " + $_.Name + "`n  " + $fence + "`n  " + ($base + (Enc ($proj + "/" + $_.Name)) + "?v=1") + "`n  " + $fence }) -join "`n"
+    $direct = Build-Links $pages $proj $base $fence 1 $false
+    $axure  = Build-Links $pages $proj $base $fence 1 $true
     $md = [IO.File]::ReadAllText($tpl)
     $md = $md.Replace('{{PROJECT}}', $proj)
     $md = $md.Replace('{{PAGE_COUNT}}', [string]$pages.Count)
@@ -99,20 +114,26 @@ Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | Fo
     return
   }
 
-  # ---- existing README: bump ?v= + version log only when page content changed ----
+  # ---- existing README ----
   $rf = $readme.FullName
-  $txt = [IO.File]::ReadAllText($rf)
+  $orig = [IO.File]::ReadAllText($rf)
+  $txt = $orig
+  # (a) refresh auto link blocks from current files (new pages appear, removed pages vanish); keep current ?v=
+  $curV = if ($txt -match '\?v=(\d+)') { ([regex]::Matches($txt,'\?v=(\d+)') | ForEach-Object { [int]$_.Groups[1].Value } | Measure-Object -Maximum).Maximum } else { 1 }
+  $txt = Set-Region $txt 'DIRECT' (Build-Links $pages $proj $base $fence $curV $false)
+  $txt = Set-Region $txt 'AXURE'  (Build-Links $pages $proj $base $fence $curV $true)
+  # (b) bump ?v= + version log only when page content changed
   $stored = if ($txt -match '<!--\s*pagehash:([0-9A-Fa-f-]+)\s*-->') { $Matches[1] } else { "" }
-  if ($stored -eq $hash) { return }            # page unchanged -> no bump
-  $ms = [regex]::Matches($txt, '\?v=(\d+)')
-  if ($ms.Count -eq 0) { return }
-  $nv = ($ms | ForEach-Object { [int]$_.Groups[1].Value } | Measure-Object -Maximum).Maximum + 1
-  $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
-  $txt = [regex]::Replace($txt, '\?v=\d+', "?v=$nv")
-  $txt = [regex]::Replace($txt, '\s*<!--\s*pagehash:[0-9A-Fa-f-]+\s*-->\s*$', '')   # drop old marker
-  $txt = $txt.TrimEnd() + "`n- v$nv  ($stamp)`n`n<!-- pagehash:$hash -->`n"
-  [IO.File]::WriteAllText($rf, $txt, (New-Object System.Text.UTF8Encoding($false)))
-  Write-Host ("[readme] " + $readme.Name + " -> v=" + $nv)
+  if ($stored -ne $hash) {
+    $nv = $curV + 1
+    $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
+    $txt = [regex]::Replace($txt, '\?v=\d+', "?v=$nv")
+    $txt = [regex]::Replace($txt, '\s*<!--\s*pagehash:[0-9A-Fa-f-]+\s*-->\s*$', '')
+    $txt = $txt.TrimEnd() + "`n- v$nv  ($stamp)`n`n<!-- pagehash:$hash -->`n"
+    Write-Host ("[readme] " + $readme.Name + " -> v=" + $nv)
+  }
+  # (c) write back only if something actually changed
+  if ($txt -ne $orig) { [IO.File]::WriteAllText($rf, $txt, (New-Object System.Text.UTF8Encoding($false))) }
 }
 
 # regenerate catalog.html grouped by top-level folder

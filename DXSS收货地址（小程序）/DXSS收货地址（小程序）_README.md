@@ -36,41 +36,53 @@
 
 ### 🔗 直接分享链接（浏览器打开）
 
-- 收货地址页（中日）：
-  ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html
-  ```
-- 收货地址页（日）：
-  ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html
-  ```
-- （中日）地址管理：
-  ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html
-  ```
-- （日）地址管理：
+<!--AUTO-LINKS:DIRECT-->
+- （日）地址管理.html
   ```
   https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html
   ```
+- （中日）地址管理.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html
+  ```
+- 个人中心.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E4%B8%AA%E4%BA%BA%E4%B8%AD%E5%BF%83.html
+  ```
+- 收货地址页（日）.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html
+  ```
+- 收货地址页（中日）.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html
+  ```
+<!--/AUTO-LINKS:DIRECT-->
 
 ### 🖼 Axure 内联框架（Inline Frame）地址
 
-- 收货地址页（中日）：
-  ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html?v=8
-  ```
-- 收货地址页（日）：
-  ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=8
-  ```
-- （中日）地址管理：
-  ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=8
-  ```
-- （日）地址管理：
+<!--AUTO-LINKS:AXURE-->
+- （日）地址管理.html
   ```
   https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=8
   ```
+- （中日）地址管理.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=8
+  ```
+- 个人中心.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E4%B8%AA%E4%BA%BA%E4%B8%AD%E5%BF%83.html?v=8
+  ```
+- 收货地址页（日）.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=8
+  ```
+- 收货地址页（中日）.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E4%B8%AD%E6%97%A5%EF%BC%89.html?v=8
+  ```
+<!--/AUTO-LINKS:AXURE-->
 
 > ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本项目时会**自动把数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
 

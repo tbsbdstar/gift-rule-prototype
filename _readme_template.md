@@ -21,11 +21,15 @@
 
 ### 🔗 直接分享链接（浏览器打开）
 
+<!--AUTO-LINKS:DIRECT-->
 {{DIRECT_LINKS}}
+<!--/AUTO-LINKS:DIRECT-->
 
 ### 🖼 Axure 内联框架（Inline Frame）地址
 
+<!--AUTO-LINKS:AXURE-->
 {{AXURE_LINKS}}
+<!--/AUTO-LINKS:AXURE-->
 
 > ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本项目、且页面内容有变化时会**自动把数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
 

@@ -31,25 +31,29 @@
 
 ### 🔗 直接分享链接（浏览器打开）
 
-- 方案A · 邮箱登录即注册：
+<!--AUTO-LINKS:DIRECT-->
+- 方案A-邮箱登录即注册(1).html
   ```
   https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E7%99%BB%E5%BD%95%E6%96%B9%E6%A1%88%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%96%B9%E6%A1%88A-%E9%82%AE%E7%AE%B1%E7%99%BB%E5%BD%95%E5%8D%B3%E6%B3%A8%E5%86%8C(1).html
   ```
-- 方案B · 邮箱登录 + 独立注册页：
+- 方案B-邮箱登录与注册(1).html
   ```
   https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E7%99%BB%E5%BD%95%E6%96%B9%E6%A1%88%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%96%B9%E6%A1%88B-%E9%82%AE%E7%AE%B1%E7%99%BB%E5%BD%95%E4%B8%8E%E6%B3%A8%E5%86%8C(1).html
   ```
+<!--/AUTO-LINKS:DIRECT-->
 
 ### 🖼 Axure 内联框架（Inline Frame）地址
 
-- 方案A · 邮箱登录即注册：
+<!--AUTO-LINKS:AXURE-->
+- 方案A-邮箱登录即注册(1).html
   ```
   https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E7%99%BB%E5%BD%95%E6%96%B9%E6%A1%88%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%96%B9%E6%A1%88A-%E9%82%AE%E7%AE%B1%E7%99%BB%E5%BD%95%E5%8D%B3%E6%B3%A8%E5%86%8C(1).html?v=1
   ```
-- 方案B · 邮箱登录 + 独立注册页：
+- 方案B-邮箱登录与注册(1).html
   ```
   https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E7%99%BB%E5%BD%95%E6%96%B9%E6%A1%88%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%96%B9%E6%A1%88B-%E9%82%AE%E7%AE%B1%E7%99%BB%E5%BD%95%E4%B8%8E%E6%B3%A8%E5%86%8C(1).html?v=1
   ```
+<!--/AUTO-LINKS:AXURE-->
 
 > ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本项目时会**自动把数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
 

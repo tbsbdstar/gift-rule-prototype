@@ -29,17 +29,23 @@
 
 页面已部署到 GitHub Pages，链接长期有效，更新后约 1 分钟自动生效。
 
-**🔗 直接分享链接**（可直接发给他人在浏览器打开）：
+### 🔗 直接分享链接（浏览器打开）
 
-```
-https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html
-```
+<!--AUTO-LINKS:DIRECT-->
+- 短信记录管理.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html
+  ```
+<!--/AUTO-LINKS:DIRECT-->
 
-**🖼 Axure 内联框架（Inline Frame）地址**（在 Axure 中拖入「内联框架」元件，把下面地址填入即可内嵌本页）：
+### 🖼 Axure 内联框架（Inline Frame）地址
 
-```
-https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=6
-```
+<!--AUTO-LINKS:AXURE-->
+- 短信记录管理.html
+  ```
+  https://tbsbdstar.github.io/gift-rule-prototype/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86/%E7%9F%AD%E4%BF%A1%E8%AE%B0%E5%BD%95%E7%AE%A1%E7%90%86.html?v=6
+  ```
+<!--/AUTO-LINKS:AXURE-->
 
 > ⚠️ 末尾 `?v=` 后的数字是**防缓存版本号**（GitHub 页面会被浏览器/Axure 缓存约 10 分钟）。发布工具每次发布本页时会**自动把这个数字 +1**；你只需把 Axure 内联框架地址里的数字，同步成与上方链接一致的最新值，即可强制加载最新内容。
 
