@@ -749,6 +749,7 @@ var editId=null;
   window.lmDel=function(id){ if(!confirm('确定删除该地址？'))return; saveAll(loadAll().filter(function(x){return x.id!==id;})); renderList(); };
   window.showList=function(){ document.getElementById('view-form').style.display='none'; document.getElementById('view-list').style.display='flex'; renderList(); };
   window.showForm=function(){ document.getElementById('view-list').style.display='none'; document.getElementById('view-form').style.display='flex'; };
+  
   window.afterSave=function(){ showList(); var b=document.getElementById('lm-list'); if(b)b.scrollTop=0; };
   function resetForm(){
     ['name','tel','zip','detail','bldg'].forEach(function(k){var e=document.getElementById(k); if(e)e.value='';});
