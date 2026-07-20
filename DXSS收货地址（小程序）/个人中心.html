@@ -18,6 +18,7 @@ body{font-family:'Noto Sans SC','Hiragino Sans','Yu Gothic',sans-serif;backgroun
 .navbar{height:48px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
 .navbar .back{position:absolute;left:18px;font-size:26px;color:var(--t1);cursor:pointer;line-height:1}
 .navbar .title{font-size:17px;font-weight:600;color:var(--t1)}
+.navbar .reset{position:absolute;right:14px;font-size:12px;color:var(--jp);cursor:pointer;user-select:none}
 
 .scroll{flex:1;overflow-y:auto;padding:10px 0 96px}
 .scroll::-webkit-scrollbar{width:0}
@@ -214,7 +215,7 @@ body{font-family:'Noto Sans SC','Hiragino Sans','Yu Gothic',sans-serif;backgroun
   </div>
   <!-- ===== 列表视图：地址管理 ===== -->
   <div id="view-list">
-    <div class="navbar"><span class="back" onclick="showProfile()">‹</span><span class="title">地址管理</span></div>
+    <div class="navbar"><span class="back" onclick="showProfile()">‹</span><span class="title">地址管理</span><span class="reset" onclick="resetDemo()">↻ 重置演示</span></div>
     <div class="scroll" id="lm-list"></div>
     <div class="footer"><button class="lm-add" onclick="newAddr()">＋ 新增日本收货地址</button></div>
   </div>
@@ -807,6 +808,7 @@ var editId=null;
   window.showEditInfo=function(){ _showView('view-editinfo'); };
   window.showList=function(){ _showView('view-list'); renderList(); };
   window.showForm=function(){ _showView('view-form'); };
+  window.resetDemo=function(){ if(confirm('确定重置为演示数据？当前的增删改会全部清空')){ localStorage.removeItem('addr_jp_only'); localStorage.removeItem('addr_jp_only_ver'); location.reload(); } };
   
   window.afterSave=function(){ showList(); var b=document.getElementById('lm-list'); if(b)b.scrollTop=0; };
   function resetForm(){

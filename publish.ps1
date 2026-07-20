@@ -1,5 +1,6 @@
 ﻿param(
   [string]$Project = "",
+  [string]$Docs = "ask",   # 文档类 md(项目内非README, 如需求/规则说明)是否入库: ask(交互询问,默认) | yes | no
   [Parameter(ValueFromRemainingArguments=$true)][string[]]$Files
 )
 # ============================================================================
@@ -104,10 +105,22 @@ foreach ($f in $Files) {
 # paths on Windows PowerShell 5.1. (See 工具说明.md for the full design.)
 $tpl = Join-Path $repo "_readme_template.md"
 $fence = '```'
+# 悬浮"重置演示"按钮：中文放数据文件 _reset_widget.html（避免脚本中文乱码），下面读进来备用
+$resetWidget = if (Test-Path (Join-Path $repo "_reset_widget.html")) { ([IO.File]::ReadAllText((Join-Path $repo "_reset_widget.html"))).Trim() } else { "" }
 Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | ForEach-Object {
   $dir = $_.FullName; $proj = $_.Name
   $allPages = Get-ChildItem $dir -Filter *.html -ErrorAction SilentlyContinue | Sort-Object Name
   if (-not $allPages) { return }
+  # 自动给"用了 localStorage 演示数据、但还没有任何重置按钮"的页面注入悬浮"重置演示"按钮（判断是否需要加；幂等）
+  if ($resetWidget) {
+    foreach ($pg in $allPages) {
+      $c = [IO.File]::ReadAllText($pg.FullName)
+      if ($c.Contains('localStorage') -and -not $c.Contains('RESET-WIDGET') -and -not $c.Contains('resetDemo')) {
+        [IO.File]::WriteAllText($pg.FullName, $c.TrimEnd() + "`n" + $resetWidget + "`n", (New-Object System.Text.UTF8Encoding($false)))
+        Write-Host ("[reset] injected -> " + $proj + "/" + $pg.Name)
+      }
+    }
+  }
   # optional exclude list "_exclude.txt" (one filename per line): keep the page ONLINE but omit it from the README
   $excl = @()
   $ef = Join-Path $dir "_exclude.txt"
@@ -204,6 +217,24 @@ $html | Out-File (Join-Path $repo "catalog.html") -Encoding utf8
 
 git -C $repo config core.quotepath false 2>$null
 git -C $repo add -A
+
+# 文档类 md（项目文件夹内、非 *_README.md，如"需求规则/说明"文档）是否随发布入库。
+# -Docs ask(默认,交互询问) | yes | no。用纯 ASCII pathspec 圈定，不涉及中文路径。
+$docSpec = @('*/*.md', ':(exclude)*/*_README.md')
+git -C $repo diff --cached --quiet -- @docSpec
+if ($LASTEXITCODE -ne 0) {                       # 有暂存的文档改动
+  $ans = $Docs
+  if ($ans -eq 'ask') {
+    $docNames = (Get-ChildItem $repo -Recurse -Filter *.md | Where-Object { $_.Name -notlike '*_README.md' -and $_.Directory.FullName -ne $repo } | ForEach-Object { $_.Name }) -join ', '
+    Write-Host ""
+    Write-Host ("[docs] Found doc .md change(s): " + $docNames)
+    $r = Read-Host "Commit these doc .md to the online repo? (y = push / Enter = keep LOCAL only)"
+    $ans = if ($r -match '^[Yy]') { 'yes' } else { 'no' }
+  }
+  if ($ans -eq 'no') { git -C $repo reset -q -- @docSpec; Write-Host "[docs] kept LOCAL (not committed)." }
+  else { Write-Host "[docs] committing to repo." }
+}
+
 $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 git -C $repo commit -m ("publish " + $ts) 2>$null
 git -C $repo pull --rebase origin main   # 先合并远端(含网页改动)，避免 push 被拒
