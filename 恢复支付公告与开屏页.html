@@ -1,0 +1,376 @@
+<style>
+  :root{
+    --page-bg:#f3efe9;
+    --page-ink:#2a2430;
+    --page-soft:#726a78;
+    --panel-bg:#ffffff;
+    --panel-border:#e7e0d6;
+
+    --app-bg:#211d24;
+    --card-bg:#fbf9f5;
+    --ink:#2b2430;
+    --ink-soft:#847b8c;
+    --hairline:#ece7e0;
+
+    --success-a:#3fd07f;
+    --success-b:#1f8f4d;
+    --success-tint-bg:#e8f7ec;
+    --success-tint-ink:#1c7a42;
+    --brand-gold:#e0ac4c;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --page-bg:#151217;
+      --page-ink:#ece6ec;
+      --page-soft:#a79cb0;
+      --panel-bg:#1e1a21;
+      --panel-border:#332c39;
+    }
+  }
+  :root[data-theme="dark"]{
+    --page-bg:#151217; --page-ink:#ece6ec; --page-soft:#a79cb0; --panel-bg:#1e1a21; --panel-border:#332c39;
+  }
+  :root[data-theme="light"]{
+    --page-bg:#f3efe9; --page-ink:#2a2430; --page-soft:#726a78; --panel-bg:#ffffff; --panel-border:#e7e0d6;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; padding:40px 24px 64px;
+    background:var(--page-bg); color:var(--page-ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  }
+
+  .intro{ max-width:720px; margin:0 auto 40px; }
+  .intro .eyebrow{
+    font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--success-tint-ink); margin:0 0 8px;
+  }
+  .intro h1{ font-size:26px; margin:0 0 10px; text-wrap:balance; letter-spacing:-.01em; }
+  .intro p{ font-size:14.5px; line-height:1.7; color:var(--page-soft); margin:0; max-width:64ch; }
+
+  .stage{
+    display:flex; gap:56px; flex-wrap:wrap; justify-content:center; align-items:flex-start;
+    max-width:1100px; margin:0 auto;
+  }
+  .frame-block{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .frame-label{ text-align:center; }
+  .frame-label .tag{
+    display:inline-block; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--success-tint-ink); background:var(--success-tint-bg); padding:3px 10px; border-radius:100px;
+    margin-bottom:6px;
+  }
+  .frame-label h2{ font-size:16px; margin:0 0 4px; }
+  .frame-label p{ font-size:12.5px; color:var(--page-soft); margin:0; max-width:34ch; line-height:1.5; }
+
+  /* ---------- phone shell ---------- */
+  .phone{
+    width:340px; height:734px; border-radius:44px; background:var(--app-bg);
+    position:relative; overflow:hidden; box-shadow:0 30px 70px -20px rgba(0,0,0,.5), 0 0 0 8px #0b090d;
+    color:#f4f1f6;
+  }
+  .status-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 22px 6px; font-size:14px; font-weight:600; position:relative; z-index:5;
+  }
+  .status-icons{ display:flex; align-items:center; gap:6px; }
+  .sig-bars{ display:flex; align-items:flex-end; gap:2px; height:9px; }
+  .sig-bars i{ display:block; width:3px; background:#f4f1f6; border-radius:1px; }
+  .sig-bars i:nth-child(1){ height:4px; } .sig-bars i:nth-child(2){ height:6px; }
+  .sig-bars i:nth-child(3){ height:8px; } .sig-bars i:nth-child(4){ height:9px; }
+  .wifi-ic{ width:14px; height:10px; }
+  .batt{ width:22px; height:11px; border:1.4px solid #f4f1f6; border-radius:3px; position:relative; padding:1.5px; }
+  .batt::after{ content:""; position:absolute; right:-4px; top:3px; width:2px; height:5px; background:#f4f1f6; border-radius:0 2px 2px 0; }
+  .batt i{ display:block; height:100%; width:75%; background:#f4f1f6; border-radius:1px; }
+  .batt-num{ font-size:12px; margin-left:2px; }
+
+  /* ---------- mockup 1 : announcement modal ---------- */
+  .m1-app-bar{ padding:2px 18px 10px; position:relative; z-index:5; }
+  .m1-brand{ display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .m1-brand .logo{
+    width:30px; height:30px; border-radius:9px; background:linear-gradient(145deg,var(--success-a),var(--success-b));
+    display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  .m1-brand .name{ font-size:16px; font-weight:800; letter-spacing:-.01em; }
+  .m1-search{
+    flex:1; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,.09);
+    border-radius:100px; padding:8px 14px; font-size:12.5px; color:#c8c1cf;
+  }
+  .m1-brand .dots{ font-size:18px; color:#c8c1cf; padding:0 2px; }
+  .m1-tag{ font-size:11.5px; color:#b7aec0; display:flex; align-items:center; gap:5px; }
+  .m1-tag .badge{ color:var(--brand-gold); }
+
+  .m1-hero{
+    position:absolute; inset:96px 0 0 0; height:230px;
+    background:
+      radial-gradient(220px 180px at 78% 10%, rgba(63,208,127,.35), transparent 70%),
+      radial-gradient(260px 200px at 10% 60%, rgba(31,143,77,.28), transparent 70%),
+      linear-gradient(180deg,#221f26,#1a171c);
+  }
+
+  .m1-scrim{ position:absolute; inset:0; background:rgba(10,8,12,.55); z-index:6; }
+
+  .m1-modal{
+    position:absolute; left:18px; right:18px; top:150px; z-index:7;
+    background:var(--card-bg); border-radius:22px; padding:22px 20px 20px;
+    box-shadow:0 24px 50px -18px rgba(0,0,0,.55);
+    animation:pop-in .5s cubic-bezier(.22,.9,.35,1) both;
+  }
+  @media (prefers-reduced-motion:reduce){ .m1-modal, .badge-icon, .splash-cta{ animation:none !important; } }
+  @keyframes pop-in{ from{ opacity:0; transform:translateY(10px) scale(.97);} to{ opacity:1; transform:none; } }
+
+  .eyebrow-pill{
+    display:block; width:max-content; margin:0 auto 12px; padding:5px 14px; border-radius:100px;
+    background:linear-gradient(120deg,var(--success-a),var(--success-b)); color:#fff;
+    font-size:10.5px; font-weight:700; letter-spacing:.16em;
+  }
+  .m1-modal h3{ text-align:center; font-size:20px; margin:0 0 6px; color:var(--ink); letter-spacing:-.01em; }
+  .m1-modal .sub{
+    text-align:center; font-size:12px; color:var(--success-tint-ink); font-weight:600; margin:0 0 16px;
+  }
+  .m1-modal .body-copy{ font-size:12.5px; line-height:1.75; color:var(--ink-soft); margin:0 0 16px; }
+  .m1-modal .body-copy b{ color:var(--success-tint-ink); font-weight:700; }
+
+  .status-list{ display:flex; flex-direction:column; margin-bottom:16px; }
+  .status-row{
+    display:flex; align-items:center; justify-content:space-between; padding:10px 2px;
+    border-bottom:1px solid var(--hairline);
+  }
+  .status-row:last-child{ border-bottom:none; }
+  .status-row .left{ display:flex; align-items:center; gap:9px; font-size:13px; font-weight:600; color:var(--ink); }
+  .status-row .dot{
+    width:20px; height:20px; border-radius:50%; background:var(--success-tint-bg); color:var(--success-tint-ink);
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; flex:none;
+  }
+  .status-pill{
+    font-size:11px; font-weight:700; padding:4px 10px; border-radius:100px;
+    background:var(--success-tint-bg); color:var(--success-tint-ink);
+  }
+
+  .note-box{
+    background:var(--success-tint-bg); border-left:3px solid var(--success-b); border-radius:8px;
+    padding:11px 13px; font-size:11.5px; line-height:1.6; color:#1c5c38; margin-bottom:14px;
+  }
+  .sig{ text-align:center; font-size:11px; color:var(--ink-soft); margin:0 0 16px; }
+
+  .cta-btn{
+    display:flex; align-items:center; justify-content:center; gap:6px; width:100%; border:none;
+    padding:14px; border-radius:100px; background:linear-gradient(120deg,var(--success-a),var(--success-b));
+    color:#fff; font-size:14.5px; font-weight:700; box-shadow:0 12px 26px -12px rgba(31,143,77,.65);
+  }
+
+  .bottom-nav{
+    position:absolute; left:0; right:0; bottom:0; height:70px; background:#1a171c;
+    border-top:1px solid rgba(255,255,255,.06); display:flex; z-index:5;
+  }
+  .bottom-nav .nav-item{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    font-size:10.5px; color:#948b9c;
+  }
+  .bottom-nav .nav-item.active{ color:var(--success-a); }
+  .bottom-nav .nav-item .ic{ font-size:18px; }
+
+  /* ---------- mockup 2 : splash ---------- */
+  .splash{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(320px 260px at 18% 14%, rgba(63,208,127,.35), transparent 65%),
+      radial-gradient(300px 320px at 88% 82%, rgba(31,143,77,.30), transparent 65%),
+      linear-gradient(165deg,#1b171f,#120f14 60%);
+  }
+  .splash-status{ position:relative; z-index:5; }
+  .skip-pill{
+    position:absolute; top:16px; right:18px; z-index:5;
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2);
+    padding:6px 13px; border-radius:100px; font-size:11.5px; font-weight:600; color:#f4f1f6;
+    display:flex; align-items:center; gap:5px;
+  }
+  .splash-content{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; text-align:center; padding:0 34px; z-index:4;
+  }
+  .badge-icon{
+    width:104px; height:104px; border-radius:50%; margin-bottom:22px; position:relative;
+    background:linear-gradient(150deg,var(--success-a),var(--success-b));
+    box-shadow:0 0 0 1px rgba(255,255,255,.14), 0 20px 40px -12px rgba(31,143,77,.6);
+    display:flex; align-items:center; justify-content:center;
+    animation:badge-in .6s cubic-bezier(.22,.9,.35,1) both;
+  }
+  @keyframes badge-in{ from{ opacity:0; transform:scale(.6);} to{ opacity:1; transform:scale(1);} }
+  .badge-icon::before{
+    content:""; position:absolute; inset:6px; border-radius:50%; border:1.5px solid rgba(255,255,255,.35);
+  }
+  .badge-icon svg{ width:46px; height:46px; }
+
+  .splash-eyebrow{
+    font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#7fe3a8; margin:0 0 12px;
+  }
+  .splash-content h2{ font-size:24px; color:#fff; margin:0 0 12px; line-height:1.4; text-wrap:balance; }
+  .splash-content p{ font-size:13px; color:#c8c1cf; line-height:1.7; margin:0 0 34px; max-width:30ch; }
+
+  .splash-cta{
+    display:flex; align-items:center; gap:16px;
+    padding:6px 6px 6px 28px; border-radius:100px;
+    background:linear-gradient(120deg,var(--success-a),var(--success-b));
+    box-shadow:0 18px 38px -14px rgba(31,143,77,.7), inset 0 1px 0 rgba(255,255,255,.28);
+    animation:pop-in .5s .15s cubic-bezier(.22,.9,.35,1) both;
+  }
+  .splash-cta span{ font-size:14.5px; font-weight:800; color:#fff; }
+  .splash-cta .cta-arrow{
+    flex:none; width:40px; height:40px; border-radius:50%; background:#fff; color:var(--success-b);
+    display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:800;
+    box-shadow:0 6px 14px rgba(0,0,0,.28);
+  }
+  .splash-footer{
+    position:absolute; left:0; right:0; bottom:26px; z-index:4; text-align:center;
+    font-size:10.5px; color:#8a8191; letter-spacing:.02em;
+  }
+
+  .notes{
+    max-width:1100px; margin:56px auto 0; background:var(--panel-bg); border:1px solid var(--panel-border);
+    border-radius:16px; padding:22px 26px;
+  }
+  .notes h3{ font-size:14px; margin:0 0 12px; }
+  .notes ul{ margin:0; padding-left:18px; font-size:13px; line-height:1.85; color:var(--page-soft); }
+  .notes li b{ color:var(--page-ink); }
+
+  @media (max-width:760px){
+    .stage{ gap:40px; }
+    .phone{ width:300px; height:648px; border-radius:38px; }
+  }
+</style>
+
+<div class="intro">
+  <p class="eyebrow">Payment Restored · UI Mockup</p>
+  <h1>恢复支付 — 公告弹窗 &amp; 开屏页</h1>
+  <p>
+    与此前"支付暂停"公告沿用同一套版式与图标语言，仅将主色从警示红切换为完成绿，
+    强化"状态已恢复、可以放心购物"的心理暗示。左侧为盘点结束后用户点开首页看到的公告弹窗，
+    右侧为下一次冷启动时展示的开屏页，用于最大范围触达用户。
+  </p>
+</div>
+
+<div class="stage">
+
+  <div class="frame-block">
+    <div class="frame-label">
+      <span class="tag">公告弹窗</span>
+      <h2>首页 · 服务恢复公告</h2>
+      <p>盘点结束后，用户进入首页自动弹出；点掉后正常浏览与下单。</p>
+    </div>
+
+    <div class="phone">
+      <div class="status-bar">
+        <span>14:30</span>
+        <span class="status-icons">
+          <span class="sig-bars"><i></i><i></i><i></i><i></i></span>
+          <svg class="wifi-ic" viewBox="0 0 16 12" fill="none"><path d="M1 4.5C4.8 1 11.2 1 15 4.5" stroke="#f4f1f6" stroke-width="1.4" stroke-linecap="round"/><path d="M3.6 7.2c2.6-2.2 6.2-2.2 8.8 0" stroke="#f4f1f6" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="10" r="1.1" fill="#f4f1f6"/></svg>
+          <span class="batt"><i></i></span>
+          <span class="batt-num">75</span>
+        </span>
+      </div>
+
+      <div class="m1-app-bar">
+        <div class="m1-brand">
+          <div class="logo">🛍️</div>
+          <div class="name">乐意门</div>
+          <div class="m1-search">🔍 请输入关键字</div>
+          <div class="dots">⋯</div>
+        </div>
+        <div class="m1-tag"><span class="badge">🏷️</span> 乐意门官方直营</div>
+      </div>
+
+      <div class="m1-hero"></div>
+      <div class="m1-scrim"></div>
+
+      <div class="m1-modal">
+        <span class="eyebrow-pill">SERVICE RESUMED</span>
+        <h3>服务恢复公告</h3>
+        <p class="sub">保税仓盘点结束 · 支付功能已全面恢复</p>
+        <p class="body-copy">
+          尊敬的乐意门用户：保税仓盘点已<b>顺利完成</b>，平台支付功能现已<b>全面恢复</b>，
+          您可正常下单结算，无需进行任何额外操作。
+        </p>
+
+        <div class="status-list">
+          <div class="status-row">
+            <span class="left"><span class="dot">✓</span>支付 / 下单结算</span>
+            <span class="status-pill">正常</span>
+          </div>
+          <div class="status-row">
+            <span class="left"><span class="dot">✓</span>商品浏览</span>
+            <span class="status-pill">正常</span>
+          </div>
+          <div class="status-row">
+            <span class="left"><span class="dot">✓</span>订单查询</span>
+            <span class="status-pill">正常</span>
+          </div>
+          <div class="status-row">
+            <span class="left"><span class="dot">✓</span>客服咨询</span>
+            <span class="status-pill">正常</span>
+          </div>
+        </div>
+
+        <div class="note-box">
+          感谢您在盘点期间的耐心等待与理解，如遇订单异常，请随时联系客服协助处理。
+        </div>
+        <p class="sig">— 乐意门运营团队 敬上 —</p>
+
+        <button class="cta-btn">立即购物 →</button>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item active"><span class="ic">⌂</span>首页</div>
+        <div class="nav-item"><span class="ic">▦</span>分类</div>
+        <div class="nav-item"><span class="ic">🛒</span>购物车</div>
+        <div class="nav-item"><span class="ic">☺</span>我的</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame-block">
+    <div class="frame-label">
+      <span class="tag">开屏页</span>
+      <h2>冷启动 · 恢复通知</h2>
+      <p>盘点结束后首次打开小程序时全屏展示一次，支持倒计时跳过。</p>
+    </div>
+
+    <div class="phone">
+      <div class="splash">
+        <div class="status-bar splash-status">
+          <span>14:30</span>
+          <span class="status-icons">
+            <span class="sig-bars"><i></i><i></i><i></i><i></i></span>
+            <svg class="wifi-ic" viewBox="0 0 16 12" fill="none"><path d="M1 4.5C4.8 1 11.2 1 15 4.5" stroke="#f4f1f6" stroke-width="1.4" stroke-linecap="round"/><path d="M3.6 7.2c2.6-2.2 6.2-2.2 8.8 0" stroke="#f4f1f6" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="10" r="1.1" fill="#f4f1f6"/></svg>
+            <span class="batt"><i></i></span>
+            <span class="batt-num">75</span>
+          </span>
+        </div>
+
+        <div class="skip-pill">跳过 3s</div>
+
+        <div class="splash-content">
+          <div class="badge-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5 9.5 18 20 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="splash-eyebrow">Payment Restored</p>
+          <h2>支付功能<br />已全面恢复</h2>
+          <p>保税仓盘点圆满结束，现在下单可正常完成支付与结算</p>
+        </div>
+
+        <div class="splash-footer">乐意门运营团队</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <h3>设计说明</h3>
+  <ul>
+    <li><b>色彩语义复用</b>：沿用支付暂停公告的版式骨架，仅将警示红替换为完成绿（#3fd07f → #1f8f4d），让用户凭色彩就能识别"问题已解决"。</li>
+    <li><b>状态清单全绿</b>：保留原来的四行状态清单结构，全部转为"正常"，用同一个组件位置强化前后对比，不需要用户重新理解一套新界面。</li>
+    <li><b>开屏页仅用于恢复</b>：暂停支付走公告弹窗/点击拦截即可，不建议做开屏页（会显得像广告打扰）；开屏页只在"喜讯"——即恢复——时用一次，带跳过按钮，不强制停留。</li>
+    <li><b>文案可配置</b>：标题、正文、状态行文案建议走同一套后台公告字段，运营改一次内容，弹窗与开屏页同步更新。</li>
+  </ul>
+</div>
