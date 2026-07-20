@@ -38,12 +38,33 @@ function Set-Region([string]$text,[string]$tag,[string]$body){
   if ($i -lt 0 -or $j -lt 0 -or $j -le $i) { return $text }
   return $text.Substring(0, $i + $a.Length) + "`n" + $body + "`n" + $text.Substring($j)
 }
-# 根据文件夹内实际页面重建"直接链接/Axure链接"两段（axure 用给定版本号）
-function Build-Links($pages,$proj,$base,$fence,$ver,$withV){
+# 根据文件夹内实际页面重建"直接链接/Axure链接"两段。$vmap = 每个文件名 -> 版本号；axure 链接用各页自己的版本号
+function Build-Links($pages,$proj,$base,$fence,$vmap,$withV){
   ($pages | ForEach-Object {
-    $u = $base + (Enc ($proj + "/" + $_.Name)); if ($withV) { $u = $u + "?v=$ver" }
+    $u = $base + (Enc ($proj + "/" + $_.Name))
+    if ($withV) { $vv = if ($vmap.ContainsKey($_.Name)) { $vmap[$_.Name] } else { 1 }; $u = $u + "?v=$vv" }
     "- " + $_.Name + "`n  " + $fence + "`n  " + $u + "`n  " + $fence
   }) -join "`n"
+}
+# 从 README 解析每页版本状态：返回 文件名 -> @{v=版本; h=MD5}（藏在 <!--PAGEVERS ... --> 里，每行 名<Tab>版本<Tab>哈希）
+function Get-PageVers([string]$text){
+  $map = @{}
+  $m = [regex]::Match($text, '(?s)<!--PAGEVERS\s*(.*?)-->')
+  if ($m.Success) {
+    foreach ($line in ($m.Groups[1].Value -split "`n")) {
+      $line = $line.Trim(); if (-not $line) { continue }
+      $p = $line -split "`t"
+      if ($p.Count -ge 3) { $map[$p[0]] = @{ v = [int]$p[1]; h = $p[2] } }
+    }
+  }
+  return $map
+}
+# 生成 <!--PAGEVERS ... --> 块（按当前页面顺序，记录每页版本与哈希）
+function Build-PageVers($state,$pages){
+  $lines = @('<!--PAGEVERS')
+  foreach ($p in $pages) { $e = $state[$p.Name]; $lines += ($p.Name + "`t" + $e.v + "`t" + $e.h) }
+  $lines += '-->'
+  return ($lines -join "`n")
 }
 
 $published = @()
@@ -93,52 +114,69 @@ Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | Fo
   if (Test-Path $ef) { $excl = @([IO.File]::ReadAllLines($ef) | ForEach-Object { $_.Trim() } | Where-Object { $_ -and -not $_.StartsWith('#') }) }
   $pages = $allPages | Where-Object { $excl -notcontains $_.Name }
   if (-not $pages) { return }   # every page excluded -> nothing to list
-  $hash = (($pages | ForEach-Object { (Get-FileHash $_.FullName -Algorithm MD5).Hash }) -join "-")
   $readme = Get-ChildItem $dir -Filter *_README.md -ErrorAction SilentlyContinue | Select-Object -First 1
+  # current MD5 of each listed page
+  $cur = @{}; foreach ($p in $pages) { $cur[$p.Name] = (Get-FileHash $p.FullName -Algorithm MD5).Hash }
 
   if (-not $readme) {
-    # ---- first publish of this project: auto-generate a README skeleton ----
+    # ---- first publish: auto-generate README; every page starts at v1 ----
     if (-not (Test-Path $tpl)) { Write-Host ("[readme] no template, skip " + $proj); return }
+    $vmap = @{}; $state = @{}
+    foreach ($p in $pages) { $vmap[$p.Name] = 1; $state[$p.Name] = @{ v = 1; h = $cur[$p.Name] } }
     $pagesList = ($pages | ForEach-Object {
       $t = ""
       $head = (Get-Content $_.FullName -TotalCount 40 -Encoding UTF8 -ErrorAction SilentlyContinue) -join "`n"
       if ($head -match '<title>\s*(.*?)\s*</title>') { $t = " - " + $Matches[1] }
       "- " + $_.Name + $t
     }) -join "`n"
-    $direct = Build-Links $pages $proj $base $fence 1 $false
-    $axure  = Build-Links $pages $proj $base $fence 1 $true
     $md = [IO.File]::ReadAllText($tpl)
     $md = $md.Replace('{{PROJECT}}', $proj)
     $md = $md.Replace('{{PAGE_COUNT}}', [string]$pages.Count)
     $md = $md.Replace('{{PAGES_LIST}}', $pagesList)
-    $md = $md.Replace('{{DIRECT_LINKS}}', $direct)
-    $md = $md.Replace('{{AXURE_LINKS}}', $axure)
+    $md = $md.Replace('{{DIRECT_LINKS}}', (Build-Links $pages $proj $base $fence $vmap $false))
+    $md = $md.Replace('{{AXURE_LINKS}}',  (Build-Links $pages $proj $base $fence $vmap $true))
     $md = $md.Replace('{{DATE}}', (Get-Date -Format 'yyyy-MM-dd'))
-    $md = $md.Replace('{{PAGEHASH}}', $hash)
+    $md = $md.Replace('{{PAGEVERS}}', (Build-PageVers $state $pages))
     [IO.File]::WriteAllText((Join-Path $dir ($proj + "_README.md")), $md, (New-Object System.Text.UTF8Encoding($false)))
-    Write-Host ("[readme] created " + $proj + "_README.md (v1, auto)")
+    Write-Host ("[readme] created " + $proj + "_README.md (per-page v1, auto)")
     return
   }
 
-  # ---- existing README ----
+  # ---- existing README: PER-PAGE versioning (change one page -> only that page's ?v= bumps) ----
   $rf = $readme.FullName
   $orig = [IO.File]::ReadAllText($rf)
   $txt = $orig
-  # (a) refresh auto link blocks from current files (new pages appear, removed pages vanish); keep current ?v=
-  $curV = if ($txt -match '\?v=(\d+)') { ([regex]::Matches($txt,'\?v=(\d+)') | ForEach-Object { [int]$_.Groups[1].Value } | Measure-Object -Maximum).Maximum } else { 1 }
-  $txt = Set-Region $txt 'DIRECT' (Build-Links $pages $proj $base $fence $curV $false)
-  $txt = Set-Region $txt 'AXURE'  (Build-Links $pages $proj $base $fence $curV $true)
-  # (b) bump ?v= + version log only when page content changed
-  $stored = if ($txt -match '<!--\s*pagehash:([0-9A-Fa-f-]+)\s*-->') { $Matches[1] } else { "" }
-  if ($stored -ne $hash) {
-    $nv = $curV + 1
-    $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
-    $txt = [regex]::Replace($txt, '\?v=\d+', "?v=$nv")
-    $txt = [regex]::Replace($txt, '\s*<!--\s*pagehash:[0-9A-Fa-f-]+\s*-->\s*$', '')
-    $txt = $txt.TrimEnd() + "`n- v$nv  ($stamp)`n`n<!-- pagehash:$hash -->`n"
-    Write-Host ("[readme] " + $readme.Name + " -> v=" + $nv)
+  $prev = Get-PageVers $txt
+  if ($prev.Count -eq 0) {
+    # migrate old project-level README: seed every page at current project ?v= + current hash (no bump this run)
+    $seedV = if ($txt -match '\?v=(\d+)') { ([regex]::Matches($txt,'\?v=(\d+)') | ForEach-Object { [int]$_.Groups[1].Value } | Measure-Object -Maximum).Maximum } else { 1 }
+    foreach ($p in $pages) { $prev[$p.Name] = @{ v = $seedV; h = $cur[$p.Name] } }
   }
-  # (c) write back only if something actually changed
+  # per-page: bump only the pages whose content changed
+  $vmap = @{}; $state = @{}; $bumped = @()
+  foreach ($p in $pages) {
+    $n = $p.Name
+    if ($prev.ContainsKey($n)) {
+      if ($prev[$n].h -eq $cur[$n]) { $v = $prev[$n].v }
+      else { $v = $prev[$n].v + 1; $bumped += ($n + " -> v" + $v) }
+    } else { $v = 1; $bumped += ($n + " -> v1 (new)") }
+    $vmap[$n] = $v; $state[$n] = @{ v = $v; h = $cur[$n] }
+  }
+  # refresh link blocks (each Axure link uses its own version)
+  $txt = Set-Region $txt 'DIRECT' (Build-Links $pages $proj $base $fence $vmap $false)
+  $txt = Set-Region $txt 'AXURE'  (Build-Links $pages $proj $base $fence $vmap $true)
+  # strip trailing markers (per-page block and any legacy combined pagehash)
+  $txt = [regex]::Replace($txt, '(?s)\s*<!--PAGEVERS.*?-->\s*$', '')
+  $txt = [regex]::Replace($txt, '(?s)\s*<!--\s*pagehash:[0-9A-Fa-f-]+\s*-->\s*$', '')
+  # append a version-log line per bumped page
+  if ($bumped.Count -gt 0) {
+    $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
+    $log = ($bumped | ForEach-Object { "- " + $_ + "  (" + $stamp + ")" }) -join "`n"
+    $txt = $txt.TrimEnd() + "`n" + $log + "`n"
+    Write-Host ("[readme] " + $readme.Name + ": " + ($bumped -join "; "))
+  }
+  # re-append the per-page version state as the very last block
+  $txt = $txt.TrimEnd() + "`n`n" + (Build-PageVers $state $pages) + "`n"
   if ($txt -ne $orig) { [IO.File]::WriteAllText($rf, $txt, (New-Object System.Text.UTF8Encoding($false))) }
 }
 

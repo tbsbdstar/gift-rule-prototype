@@ -65,4 +65,6 @@ https://tbsbdstar.github.io/gift-rule-prototype/catalog.html
 
 - v1  (2026-07-08) · 初版发布
 
-<!-- pagehash:89F661B0882C197C5489791ECDDFFE90 -->
+<!--PAGEVERS
+PC端新增日本收货地址.html	1	89F661B0882C197C5489791ECDDFFE90
+-->

@@ -75,4 +75,7 @@ https://tbsbdstar.github.io/gift-rule-prototype/catalog.html
 
 - v1  (2026-07-15) · 初版发布（方案A + 方案B 两套登录/注册方案）
 
-<!-- pagehash:AD6735E8A6A2BE92E41F971D893BC6D1-FFD1B4963757068C41F0AFCCE73BCAF7 -->
+<!--PAGEVERS
+方案A-邮箱登录即注册(1).html	1	AD6735E8A6A2BE92E41F971D893BC6D1
+方案B-邮箱登录与注册(1).html	1	FFD1B4963757068C41F0AFCCE73BCAF7
+-->

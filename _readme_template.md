@@ -49,6 +49,6 @@ https://tbsbdstar.github.io/gift-rule-prototype/catalog.html
 
 > 每次发布工具会自动在下方追加一条（`v版本号 (时间)`）；如需补充改动说明，可在对应行后面续写。
 
-- v1  ({{DATE}}) · 初版发布（工具自动生成）
+- 初版发布 ({{DATE}})（工具自动生成，各页起始 v1）
 
-<!-- pagehash:{{PAGEHASH}} -->
+{{PAGEVERS}}

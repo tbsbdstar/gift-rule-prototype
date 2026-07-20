@@ -79,4 +79,6 @@ https://tbsbdstar.github.io/gift-rule-prototype/catalog.html
 - v5  (2026-06-16 13:27)
 - v6  (2026-07-08 11:22)
 
-<!-- pagehash:47D0BF917D4BF9CAE1F12559291DE0B4 -->
+<!--PAGEVERS
+短信记录管理.html	6	47D0BF917D4BF9CAE1F12559291DE0B4
+-->
