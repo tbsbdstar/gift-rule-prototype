@@ -85,8 +85,14 @@ $tpl = Join-Path $repo "_readme_template.md"
 $fence = '```'
 Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | ForEach-Object {
   $dir = $_.FullName; $proj = $_.Name
-  $pages = Get-ChildItem $dir -Filter *.html -ErrorAction SilentlyContinue | Sort-Object Name
-  if (-not $pages) { return }
+  $allPages = Get-ChildItem $dir -Filter *.html -ErrorAction SilentlyContinue | Sort-Object Name
+  if (-not $allPages) { return }
+  # optional exclude list "_exclude.txt" (one filename per line): keep the page ONLINE but omit it from the README
+  $excl = @()
+  $ef = Join-Path $dir "_exclude.txt"
+  if (Test-Path $ef) { $excl = @([IO.File]::ReadAllLines($ef) | ForEach-Object { $_.Trim() } | Where-Object { $_ -and -not $_.StartsWith('#') }) }
+  $pages = $allPages | Where-Object { $excl -notcontains $_.Name }
+  if (-not $pages) { return }   # every page excluded -> nothing to list
   $hash = (($pages | ForEach-Object { (Get-FileHash $_.FullName -Algorithm MD5).Hash }) -join "-")
   $readme = Get-ChildItem $dir -Filter *_README.md -ErrorAction SilentlyContinue | Select-Object -First 1
 
