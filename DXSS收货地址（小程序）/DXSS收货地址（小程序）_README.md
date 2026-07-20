@@ -64,7 +64,7 @@
 <!--AUTO-LINKS:AXURE-->
 - （日）地址管理.html
   ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=8
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%EF%BC%88%E6%97%A5%EF%BC%89%E5%9C%B0%E5%9D%80%E7%AE%A1%E7%90%86.html?v=9
   ```
 - （中日）地址管理.html
   ```
@@ -76,7 +76,7 @@
   ```
 - 收货地址页（日）.html
   ```
-  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=8
+  https://tbsbdstar.github.io/gift-rule-prototype/DXSS%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%EF%BC%88%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89/%E6%94%B6%E8%B4%A7%E5%9C%B0%E5%9D%80%E9%A1%B5%EF%BC%88%E6%97%A5%EF%BC%89.html?v=9
   ```
 - 收货地址页（中日）.html
   ```
@@ -110,11 +110,13 @@ https://tbsbdstar.github.io/gift-rule-prototype/catalog.html
 - v6  (2026-07-16 15:58)
 - v7  (2026-07-17 11:15)
 - v8  (2026-07-20 11:16)
+- （日）地址管理.html -> v9  (2026-07-20 12:55)
+- 收货地址页（日）.html -> v9  (2026-07-20 12:55)
 
 <!--PAGEVERS
-（日）地址管理.html	8	0C207E5FA0FB68CDF31F94912A401F11
+（日）地址管理.html	9	D3469CA9CC468DA8670F8F4246E1AB60
 （中日）地址管理.html	8	49DC566027A8A0F73847604180BEE5E1
 个人中心.html	8	48B5DAD2A1AB662DD933CBCB08AA5240
-收货地址页（日）.html	8	5D7D07E481C29903626B60B9A222FD44
+收货地址页（日）.html	9	4E3DFCBEE35D18CAAC9864CD9B6E1316
 收货地址页（中日）.html	8	B4C4068737B416FB5374E4E9D41DC405
 -->
