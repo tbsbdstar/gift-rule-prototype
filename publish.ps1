@@ -1,6 +1,7 @@
 ﻿param(
   [Parameter(Position=0, ValueFromRemainingArguments=$true)][string[]]$Files,   # 拖入的文件/文件夹(全部进这里)
-  [string]$Docs = "ask"    # 文档类 md(项目内非README, 如需求/规则说明)是否入库: ask(交互询问,默认) | yes | no。只能具名传 -Docs
+  [string]$Docs = "ask",   # 文档类 md(项目内非README, 如需求/规则说明)是否入库: ask(交互询问,默认) | yes | no。只能具名传 -Docs
+  [switch]$Y               # 跳过"未拖文件时的同步确认"(供 Claude 无人值守调用；.bat 不传, 用户会看到确认)
 )
 # ============================================================================
 # 发布HTML到在线 —— 把原型 HTML 发布到 GitHub Pages（tbsbdstar/gift-rule-prototype）
@@ -66,6 +67,18 @@ function Build-PageVers($state,$pages){
   foreach ($p in $pages) { $e = $state[$p.Name]; $lines += ($p.Name + "`t" + $e.v + "`t" + $e.h) }
   $lines += '-->'
   return ($lines -join "`n")
+}
+
+# 没有拖入任何文件 = "同步模式"：把本地所有改动一次性发布。给出确认，避免误触。
+# （-Y 可跳过，供 Claude 无人值守调用；平时用户双击 .bat 不带 -Y，会看到确认）
+if ((-not $Files -or @($Files).Count -eq 0) -and -not $Y) {
+  $chg = @(git -C $repo status --porcelain 2>$null)
+  Write-Host ""
+  if ($chg.Count -gt 0) { Write-Host ("你没有拖入文件。检测到本地有 " + $chg.Count + " 处改动（你直接改过的文件）。") }
+  else { Write-Host "你没有拖入文件，且没检测到本地改动（继续的话只会刷新首页/目录页）。" }
+  Write-Host "提示：要发布某个页面/项目，请把 .html 或文件夹【拖到本 .bat 上】。"
+  $go = Read-Host "现在是否【同步全部本地改动】到线上？(回车=是，全部同步 / 输 N=取消)"
+  if ($go -match '^[Nn]') { Write-Host "已取消，未做任何发布。"; return }
 }
 
 $published = @()
