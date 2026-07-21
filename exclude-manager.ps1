@@ -1,13 +1,14 @@
-# exclude-manager.ps1 —— 维护某项目的 README 排除名单 _exclude.txt
-# 拖一个项目文件夹到 设置不列入.bat 即可运行。被排除的页面仍会在线，只是不列进 README。
-# 说明：本脚本提示语一律用 ASCII（PS5.1 读无 BOM 脚本时中文字面量会乱码）；文件名从磁盘读取，显示中文正常。
+# exclude-manager.ps1 - maintain a project's README exclude list "_exclude.txt".
+# Drag a PROJECT FOLDER onto 设置不列入.bat to run. Excluded pages stay ONLINE, just not listed in the README.
+# NOTE: all echoed/written strings are ASCII on purpose (PS 5.1 mangles Chinese string
+# literals in a no-BOM .ps1). File names are read from disk, so they display fine.
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Args)
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 $folder = $Args | Where-Object { $_ } | Select-Object -First 1
 if (-not $folder -or -not (Test-Path $folder -PathType Container)) {
-  Write-Host "Please DRAG A PROJECT FOLDER onto 设置不列入.bat (a folder path is required)."
+  Write-Host "Please DRAG A PROJECT FOLDER onto this .bat (a folder path is required)."
   return
 }
 $pages = Get-ChildItem $folder -Filter *.html -ErrorAction SilentlyContinue | Sort-Object Name
@@ -36,13 +37,13 @@ if ($sel -and $sel.Trim()) {
       else { $excl += $name }
     }
   }
-  $header = "# Pages excluded from the README link list (still deployed & reachable by direct URL)."
-  $header2 = "# One filename per line. Managed by 设置不列入.bat . Re-run 发布HTML到在线 to apply."
+  $header  = "# Pages excluded from the README link list (still deployed, reachable by direct URL)."
+  $header2 = "# One filename per line. Edited by the exclude .bat. Re-run the publish .bat to apply."
   $out = @($header, $header2) + @($excl | Sort-Object -Unique)
   [IO.File]::WriteAllLines($ef, $out, (New-Object System.Text.UTF8Encoding($false)))
   Write-Host ""
   Write-Host ("Saved _exclude.txt. Excluded now: " + (@($excl | Sort-Object -Unique) -join ", "))
-  Write-Host "==> Now run 发布HTML到在线 to apply the change to the README."
+  Write-Host "==> Now run the publish tool (the HTML publish .bat) to apply it to the README."
 } else {
   Write-Host "No change."
 }

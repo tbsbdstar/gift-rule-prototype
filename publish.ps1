@@ -239,6 +239,20 @@ $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 git -C $repo commit -m ("publish " + $ts) 2>$null
 git -C $repo pull --rebase origin main   # 先合并远端(含网页改动)，避免 push 被拒
 git -C $repo push
+if ($LASTEXITCODE -ne 0) {               # push 失败(网络等) -> 重试一次
+  Write-Host "[push] first attempt failed, retrying..."
+  git -C $repo pull --rebase origin main
+  git -C $repo push
+}
+if ($LASTEXITCODE -ne 0) {               # 仍失败 -> 醒目报错(改动只在本地)
+  Write-Host ""
+  Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  Write-Host "!!! PUSH FAILED - changes are LOCAL ONLY, NOT online."
+  Write-Host "!!! Check network/VPN, then double-click the .bat again."
+  Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+} else {
+  Write-Host "[push] OK - synced to GitHub."
+}
 
 Write-Host ""
 Write-Host "==================== ONLINE LINKS ===================="
