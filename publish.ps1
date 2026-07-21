@@ -1,7 +1,6 @@
 ﻿param(
-  [string]$Project = "",
-  [string]$Docs = "ask",   # 文档类 md(项目内非README, 如需求/规则说明)是否入库: ask(交互询问,默认) | yes | no
-  [Parameter(ValueFromRemainingArguments=$true)][string[]]$Files
+  [Parameter(Position=0, ValueFromRemainingArguments=$true)][string[]]$Files,   # 拖入的文件/文件夹(全部进这里)
+  [string]$Docs = "ask"    # 文档类 md(项目内非README, 如需求/规则说明)是否入库: ask(交互询问,默认) | yes | no。只能具名传 -Docs
 )
 # ============================================================================
 # 发布HTML到在线 —— 把原型 HTML 发布到 GitHub Pages（tbsbdstar/gift-rule-prototype）
