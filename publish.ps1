@@ -80,7 +80,7 @@ foreach ($f in $Files) {
     Get-ChildItem $target -Recurse -Filter *.html | ForEach-Object {
       $published += ($proj + "/" + $_.Name)
     }
-    Write-Host ("[folder] " + $proj + "  (" + (Get-ChildItem $target -Recurse -Filter *.html).Count + " html)")
+    Write-Host ("[文件夹] " + $proj + "  (" + (Get-ChildItem $target -Recurse -Filter *.html).Count + " 个页面)")
   }
   elseif ([IO.Path]::GetExtension($f) -ieq ".html") {
     $name = [IO.Path]::GetFileName($f)
@@ -93,7 +93,7 @@ foreach ($f in $Files) {
       Copy-Item $f (Join-Path $repo $name) -Force
       $published += $name
     }
-    Write-Host ("[file] " + $name + $(if($Project){" -> "+$Project} else {""}))
+    Write-Host ("[文件] " + $name + $(if($Project){" -> "+$Project} else {""}))
   }
 }
 
@@ -117,7 +117,7 @@ Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | Fo
       $c = [IO.File]::ReadAllText($pg.FullName)
       if ($c.Contains('localStorage') -and -not $c.Contains('RESET-WIDGET') -and -not $c.Contains('resetDemo')) {
         [IO.File]::WriteAllText($pg.FullName, $c.TrimEnd() + "`n" + $resetWidget + "`n", (New-Object System.Text.UTF8Encoding($false)))
-        Write-Host ("[reset] injected -> " + $proj + "/" + $pg.Name)
+        Write-Host ("[重置按钮] 已注入 -> " + $proj + "/" + $pg.Name)
       }
     }
   }
@@ -133,7 +133,7 @@ Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | Fo
 
   if (-not $readme) {
     # ---- first publish: auto-generate README; every page starts at v1 ----
-    if (-not (Test-Path $tpl)) { Write-Host ("[readme] no template, skip " + $proj); return }
+    if (-not (Test-Path $tpl)) { Write-Host ("[README] 缺少模板，跳过 " + $proj); return }
     $vmap = @{}; $state = @{}
     foreach ($p in $pages) { $vmap[$p.Name] = 1; $state[$p.Name] = @{ v = 1; h = $cur[$p.Name] } }
     $pagesList = ($pages | ForEach-Object {
@@ -151,7 +151,7 @@ Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | Fo
     $md = $md.Replace('{{DATE}}', (Get-Date -Format 'yyyy-MM-dd'))
     $md = $md.Replace('{{PAGEVERS}}', (Build-PageVers $state $pages))
     [IO.File]::WriteAllText((Join-Path $dir ($proj + "_README.md")), $md, (New-Object System.Text.UTF8Encoding($false)))
-    Write-Host ("[readme] created " + $proj + "_README.md (per-page v1, auto)")
+    Write-Host ("[README] 已自动生成 " + $proj + "_README.md（各页从 v1 起）")
     return
   }
 
@@ -186,7 +186,7 @@ Get-ChildItem $repo -Directory | Where-Object { $_.Name -notmatch '^[._]' } | Fo
     $stamp = Get-Date -Format "yyyy-MM-dd HH:mm"
     $log = ($bumped | ForEach-Object { "- " + $_ + "  (" + $stamp + ")" }) -join "`n"
     $txt = $txt.TrimEnd() + "`n" + $log + "`n"
-    Write-Host ("[readme] " + $readme.Name + ": " + ($bumped -join "; "))
+    Write-Host ("[README] " + $readme.Name + " 版本更新：" + ($bumped -join "; "))
   }
   # re-append the per-page version state as the very last block
   $txt = $txt.TrimEnd() + "`n`n" + (Build-PageVers $state $pages) + "`n"
@@ -227,12 +227,12 @@ if ($LASTEXITCODE -ne 0) {                       # 有暂存的文档改动
   if ($ans -eq 'ask') {
     $docNames = (Get-ChildItem $repo -Recurse -Filter *.md | Where-Object { $_.Name -notlike '*_README.md' -and $_.Directory.FullName -ne $repo } | ForEach-Object { $_.Name }) -join ', '
     Write-Host ""
-    Write-Host ("[docs] Found doc .md change(s): " + $docNames)
-    $r = Read-Host "Commit these doc .md to the online repo? (y = push / Enter = keep LOCAL only)"
+    Write-Host ("[文档] 检测到文档改动：" + $docNames)
+    $r = Read-Host "这些文档要提交到线上仓库吗？(y=推送上线 / 直接回车=只留本地)"
     $ans = if ($r -match '^[Yy]') { 'yes' } else { 'no' }
   }
-  if ($ans -eq 'no') { git -C $repo reset -q -- @docSpec; Write-Host "[docs] kept LOCAL (not committed)." }
-  else { Write-Host "[docs] committing to repo." }
+  if ($ans -eq 'no') { git -C $repo reset -q -- @docSpec; Write-Host "[文档] 已保留本地（本次不提交）。" }
+  else { Write-Host "[文档] 将随本次发布提交到仓库。" }
 }
 
 $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -240,27 +240,27 @@ git -C $repo commit -m ("publish " + $ts) 2>$null
 git -C $repo pull --rebase origin main   # 先合并远端(含网页改动)，避免 push 被拒
 git -C $repo push
 if ($LASTEXITCODE -ne 0) {               # push 失败(网络等) -> 重试一次
-  Write-Host "[push] first attempt failed, retrying..."
+  Write-Host "[推送] 第一次失败，正在重试……"
   git -C $repo pull --rebase origin main
   git -C $repo push
 }
 if ($LASTEXITCODE -ne 0) {               # 仍失败 -> 醒目报错(改动只在本地)
   Write-Host ""
   Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  Write-Host "!!! PUSH FAILED - changes are LOCAL ONLY, NOT online."
-  Write-Host "!!! Check network/VPN, then double-click the .bat again."
+  Write-Host "!!! 推送失败！改动只在本地，【尚未上线】。"
+  Write-Host "!!! 请检查网络/VPN，然后再双击一次 .bat 重新发布。"
   Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 } else {
-  Write-Host "[push] OK - synced to GitHub."
+  Write-Host "[推送] 成功，已同步到 GitHub。"
 }
 
 Write-Host ""
-Write-Host "==================== ONLINE LINKS ===================="
-Write-Host ("Catalog : " + $base + "catalog.html")
+Write-Host "==================== 在线链接 ===================="
+Write-Host ("目录页：" + $base + "catalog.html")
 if ($published.Count -gt 0) {
-  Write-Host "Published/updated this run:"
+  Write-Host "本次发布/更新："
   foreach ($r in ($published | Sort-Object -Unique)) { Write-Host ("  " + $base + (Enc $r)) }
 }
-Write-Host "======================================================"
-Write-Host "GitHub Pages takes ~1 min to update."
+Write-Host "=================================================="
+Write-Host "GitHub Pages 约 1 分钟后生效。"
 
