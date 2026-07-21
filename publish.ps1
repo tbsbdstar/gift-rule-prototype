@@ -8,9 +8,10 @@
 # 完整设计与背景见同目录 工具说明.md（换电脑/新会话读它即可上手）。
 #
 # 用法（对应 发布HTML到在线.bat）：
-#   - 拖一个项目文件夹到 .bat        -> 发布为 /<文件夹名>/...
-#   - 拖单个/多个 .html 到 .bat      -> .bat 会问项目子目录名（回车=根目录）
-#   - 直接双击（不拖任何东西）        -> 同步全部改动 + 刷新赠品规则首页
+#   - 拖单个 .html 到 .bat    -> 自动以"该文件名(去扩展名)"建同名文件夹并发布，不询问
+#   - 拖一个项目文件夹到 .bat -> 询问"全部发布 / 选哪几个页面"，只发所选
+#   - 直接双击（不拖任何东西）-> 同步全部改动 + 刷新赠品规则首页
+# 无论哪种：目标文件夹有 README 就更新版本/链接，没有就自动创建（含链接、按页 ?v= 版本）
 #
 # 本脚本每次运行会自动：
 #   1) 刷新首页 index.html（= 赠品规则源文件）
@@ -71,29 +72,42 @@ function Build-PageVers($state,$pages){
 $published = @()
 foreach ($f in $Files) {
   if (-not (Test-Path $f)) { continue }
+
   if (Test-Path $f -PathType Container) {
-    # a project folder -> /<folderName>/
+    # ===== 拖入文件夹：询问发布哪些页面（全部 / 部分）=====
     $proj = Split-Path $f -Leaf
-    $target = Join-Path $repo $proj
-    if (Test-Path $target) { Remove-Item $target -Recurse -Force }
-    Copy-Item $f $target -Recurse -Force
-    Get-ChildItem $target -Recurse -Filter *.html | ForEach-Object {
-      $published += ($proj + "/" + $_.Name)
+    $srcPages = @(Get-ChildItem $f -Filter *.html -ErrorAction SilentlyContinue | Sort-Object Name)
+    if (-not $srcPages) { Write-Host ("[跳过] 文件夹里没有 html 页面：" + $proj); continue }
+    $pick = @()
+    if ($srcPages.Count -eq 1) {
+      $pick = $srcPages
+    } else {
+      Write-Host ""
+      Write-Host ("【" + $proj + "】共有 " + $srcPages.Count + " 个页面：")
+      for ($i = 0; $i -lt $srcPages.Count; $i++) { Write-Host ("  {0}. {1}" -f ($i + 1), $srcPages[$i].Name) }
+      $sel = Read-Host "要发布哪些？直接回车=全部发布；或输入编号（逗号分隔，如 1,3）"
+      if (-not $sel -or -not $sel.Trim()) {
+        $pick = $srcPages
+      } else {
+        $nums = $sel -split '[,\s]+' | Where-Object { $_ -match '^\d+$' } | ForEach-Object { [int]$_ }
+        $pick = @(foreach ($n in $nums) { if ($n -ge 1 -and $n -le $srcPages.Count) { $srcPages[$n - 1] } })
+      }
     }
-    Write-Host ("[文件夹] " + $proj + "  (" + (Get-ChildItem $target -Recurse -Filter *.html).Count + " 个页面)")
+    if (-not $pick) { Write-Host "[跳过] 未选择任何页面。"; continue }
+    $target = Join-Path $repo $proj
+    if (-not (Test-Path $target)) { New-Item -ItemType Directory $target | Out-Null }
+    foreach ($pg in $pick) { Copy-Item $pg.FullName (Join-Path $target $pg.Name) -Force; $published += ($proj + "/" + $pg.Name) }
+    Write-Host ("[文件夹] " + $proj + "  已发布 " + @($pick).Count + "/" + $srcPages.Count + " 个页面")
   }
   elseif ([IO.Path]::GetExtension($f) -ieq ".html") {
+    # ===== 拖入单个 html：以该 html 名建同名文件夹，直接发布（不询问）=====
     $name = [IO.Path]::GetFileName($f)
-    if ($Project -ne "") {
-      $dir = Join-Path $repo $Project
-      if (-not (Test-Path $dir)) { New-Item -ItemType Directory $dir | Out-Null }
-      Copy-Item $f (Join-Path $dir $name) -Force
-      $published += ($Project + "/" + $name)
-    } else {
-      Copy-Item $f (Join-Path $repo $name) -Force
-      $published += $name
-    }
-    Write-Host ("[文件] " + $name + $(if($Project){" -> "+$Project} else {""}))
+    $projName = [IO.Path]::GetFileNameWithoutExtension($f)
+    $target = Join-Path $repo $projName
+    if (-not (Test-Path $target)) { New-Item -ItemType Directory $target | Out-Null }
+    Copy-Item $f (Join-Path $target $name) -Force
+    $published += ($projName + "/" + $name)
+    Write-Host ("[单页] " + $name + "  ->  " + $projName + "\")
   }
 }
 
